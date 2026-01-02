@@ -1,8 +1,7 @@
 import { Suspense } from "react"
 import { GatewaysContent } from "@/components/gateways-content"
 import { GatewaysSkeleton } from "@/components/skeleton"
-import { PageHeader } from "@/components/page-layout"
-import { PageWrapper } from "@/components/page-layout"
+import { PageHeader, PageWrapper } from "@/components/page-layout"
 import { AddGatewayDialog } from "@/components/dialog-add-gateway"
 
 export const metadata = {

@@ -1,11 +1,24 @@
-"use client"
+"use client";
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Switch } from "@/components/ui/switch"
-import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,22 +26,32 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Button } from "@/components/ui/button"
-import { MoreHorizontal, CheckCircle2, XCircle, RefreshCw, Edit, Trash2, UserCog, Shield, Mail } from "lucide-react"
-import type { AuthUsers } from "@/lib/mock-data"
-import { getUserRoles } from "@/lib/mock-data"
-import { formatDistanceToNow } from "date-fns"
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import {
+  MoreHorizontal,
+  CheckCircle2,
+  XCircle,
+  RefreshCw,
+  Edit,
+  Trash2,
+  UserCog,
+  Shield,
+  Mail,
+} from "lucide-react";
+import type { AuthUsers } from "@/lib/mock-data";
+import { getUserRoles } from "@/lib/mock-data";
+import { formatDistanceToNow } from "date-fns";
 
 interface UsersTableProps {
-  users: AuthUsers[]
-  selectedUsers: string[]
-  toggleSelected: (id: string) => void
-  toggleAll: () => void
-  toggleStatus: (id: string) => void
-  onEdit: (user: AuthUsers) => void
-  onDelete: (id: string) => void
-  isLoading: Record<string, boolean>
+  users: AuthUsers[];
+  selectedUsers: string[];
+  toggleSelected: (id: string) => void;
+  toggleAll: () => void;
+  toggleStatus: (id: string) => void;
+  onEdit: (user: AuthUsers) => void;
+  onDelete: (id: string) => void;
+  isLoading: Record<string, boolean>;
 }
 
 export function UsersTable({
@@ -51,7 +74,7 @@ export function UsersTable({
           <XCircle className="mr-1 h-3.5 w-3.5" />
           Inactive
         </Badge>
-      )
+      );
     } else {
       return (
         <Badge
@@ -61,12 +84,12 @@ export function UsersTable({
           <CheckCircle2 className="mr-1 h-3.5 w-3.5" />
           Active
         </Badge>
-      )
+      );
     }
-  }
+  };
 
   const getRoleBadges = (user: AuthUsers) => {
-    const roles = getUserRoles(user)
+    const roles = getUserRoles(user);
 
     return (
       <div className="flex flex-wrap gap-1">
@@ -80,7 +103,7 @@ export function UsersTable({
                 >
                   Admin
                 </Badge>
-              )
+              );
             case "superuser":
               return (
                 <Badge
@@ -89,7 +112,7 @@ export function UsersTable({
                 >
                   Superuser
                 </Badge>
-              )
+              );
             case "staff":
               return (
                 <Badge
@@ -98,7 +121,7 @@ export function UsersTable({
                 >
                   Staff
                 </Badge>
-              )
+              );
             case "member":
               return (
                 <Badge
@@ -107,30 +130,32 @@ export function UsersTable({
                 >
                   Member
                 </Badge>
-              )
+              );
             default:
-              return <Badge key={role}>{role}</Badge>
+              return <Badge key={role}>{role}</Badge>;
           }
         })}
       </div>
-    )
-  }
+    );
+  };
 
   const formatLastLogin = (lastLogin?: string) => {
-    if (!lastLogin) return "Never"
+    if (!lastLogin) return "Never";
     try {
-      return formatDistanceToNow(new Date(lastLogin), { addSuffix: true })
+      return formatDistanceToNow(new Date(lastLogin), { addSuffix: true });
     } catch (error) {
-      return "Unknown"
+      return "Unknown";
     }
-  }
+  };
 
   return (
     <Card>
       <CardHeader className="pb-3">
         <CardTitle>Users</CardTitle>
         <CardDescription>
-          {selectedUsers.length > 0 ? `${selectedUsers.length} users selected` : `${users.length} users found`}
+          {selectedUsers.length > 0
+            ? `${selectedUsers.length} users selected`
+            : `${users.length} users found`}
         </CardDescription>
       </CardHeader>
       <CardContent className="p-0">
@@ -140,16 +165,22 @@ export function UsersTable({
               <TableRow>
                 <TableHead className="w-[50px]">
                   <Checkbox
-                    checked={selectedUsers.length === users.length && users.length > 0}
+                    checked={
+                      selectedUsers.length === users.length && users.length > 0
+                    }
                     onCheckedChange={toggleAll}
                   />
                 </TableHead>
                 <TableHead>Name</TableHead>
                 <TableHead>Email</TableHead>
                 <TableHead>Roles</TableHead>
-                <TableHead className="hidden md:table-cell">Department</TableHead>
+                <TableHead className="hidden md:table-cell">
+                  Department
+                </TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead className="hidden lg:table-cell">Last Login</TableHead>
+                <TableHead className="hidden lg:table-cell">
+                  Last Login
+                </TableHead>
                 <TableHead className="w-[70px]"></TableHead>
               </TableRow>
             </TableHeader>
@@ -160,7 +191,9 @@ export function UsersTable({
                     <div className="flex flex-col items-center justify-center text-muted-foreground">
                       <UserCog className="h-8 w-8 mb-2 opacity-40" />
                       <p>No users found</p>
-                      <p className="text-sm">Try adjusting your search or filters</p>
+                      <p className="text-sm">
+                        Try adjusting your search or filters
+                      </p>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -184,9 +217,13 @@ export function UsersTable({
                         <div className="font-medium">{user.displayName}</div>
                       </div>
                     </TableCell>
-                    <TableCell className="font-mono text-sm">{user.email}</TableCell>
+                    <TableCell className="font-mono text-sm">
+                      {user.email}
+                    </TableCell>
                     <TableCell>{getRoleBadges(user)}</TableCell>
-                    <TableCell className="hidden md:table-cell">{user.department || "-"}</TableCell>
+                    <TableCell className="hidden md:table-cell">
+                      {user.department || "-"}
+                    </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
                         <Switch
@@ -208,14 +245,20 @@ export function UsersTable({
                     <TableCell>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0 opacity-70 group-hover:opacity-100">
+                          <Button
+                            variant="ghost"
+                            className="h-8 w-8 p-0 opacity-70 group-hover:opacity-100"
+                          >
                             <span className="sr-only">Open menu</span>
                             <MoreHorizontal className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                          <DropdownMenuItem onClick={() => onEdit(user)} className="cursor-pointer">
+                          <DropdownMenuItem
+                            onClick={() => onEdit(user)}
+                            className="cursor-pointer"
+                          >
                             <Edit className="mr-2 h-4 w-4" />
                             Edit User
                           </DropdownMenuItem>
@@ -246,6 +289,5 @@ export function UsersTable({
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
-

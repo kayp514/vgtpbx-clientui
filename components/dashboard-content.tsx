@@ -7,7 +7,7 @@ interface DashboardContentProps extends React.HTMLAttributes<HTMLDivElement> {
 
 export function DashboardContent({ children, className, ...props }: DashboardContentProps) {
   return (
-    <div className={cn("w-full max-w-7xl mx-auto px-4 py-6 md:px-6 lg:px-8", className)} {...props}>
+    <div className={cn("w-full mx-auto", className)} {...props}>
       {children}
     </div>
   )
@@ -26,7 +26,7 @@ export function ContentSection({ children, title, description, actions, classNam
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           {title && (
             <div>
-              <h1 className="text-3xl font-bold tracking-tight">{title}</h1>
+               <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
               {description && <p className="text-muted-foreground mt-1">{description}</p>}
             </div>
           )}
