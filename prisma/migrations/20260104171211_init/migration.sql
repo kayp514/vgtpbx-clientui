@@ -25,24 +25,22 @@ CREATE TABLE "auth_group_permissions" (
 );
 
 -- CreateTable
-CREATE TABLE "tenants" (
+CREATE TABLE "auth_tenant" (
     "id" VARCHAR(50) NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "name" VARCHAR(100) NOT NULL,
-    "domain" VARCHAR(100) NOT NULL,
     "description" VARCHAR(500),
-    "logo" VARCHAR(255),
-    "plan" VARCHAR(20) NOT NULL DEFAULT 'basic',
-    "maxUsers" INTEGER NOT NULL DEFAULT 5,
+    "firebaseTenantId" VARCHAR(50),
     "disabled" BOOLEAN NOT NULL DEFAULT false,
 
-    CONSTRAINT "tenants_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "auth_tenant_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "auth_user" (
     "uid" VARCHAR(50) NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "email" VARCHAR(255) NOT NULL,
     "displayName" VARCHAR(100),
@@ -50,16 +48,51 @@ CREATE TABLE "auth_user" (
     "lastName" VARCHAR(150),
     "avatar" VARCHAR(255),
     "phoneNumber" VARCHAR(20),
-    "isSuperuser" BOOLEAN NOT NULL DEFAULT false,
-    "isAdmin" BOOLEAN NOT NULL DEFAULT false,
-    "isStaff" BOOLEAN NOT NULL DEFAULT false,
-    "emailVerified" BOOLEAN NOT NULL DEFAULT false,
     "disabled" BOOLEAN NOT NULL DEFAULT false,
-    "tenantId" VARCHAR(50) NOT NULL,
-    "createdAt" TIMESTAMP(3),
     "lastSignInAt" TIMESTAMP(3),
+    "tenantId" VARCHAR(50) NOT NULL DEFAULT 'default',
 
     CONSTRAINT "auth_user_pkey" PRIMARY KEY ("uid")
+);
+
+-- CreateTable
+CREATE TABLE "invite" (
+    "id" VARCHAR(50) NOT NULL DEFAULT 'inv_' || gen_random_uuid(),
+    "email" VARCHAR(255) NOT NULL,
+    "domainId" UUID NOT NULL,
+    "groupId" INTEGER NOT NULL,
+    "token" VARCHAR(100) NOT NULL,
+    "expiresAt" TIMESTAMP(3) NOT NULL,
+    "usedAt" TIMESTAMP(3),
+    "createdBy" VARCHAR(50) NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "invite_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "subscription" (
+    "id" VARCHAR(50) NOT NULL DEFAULT 'sub_' || gen_random_uuid(),
+    "domainId" UUID NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "slug" VARCHAR(100) NOT NULL,
+    "displayName" VARCHAR(200),
+    "logo" VARCHAR(255),
+    "plan" VARCHAR(20) NOT NULL DEFAULT 'basic',
+    "maxUsers" INTEGER NOT NULL DEFAULT 5,
+    "maxExtensions" INTEGER NOT NULL DEFAULT 10,
+    "stripeCustomerId" VARCHAR(100),
+    "stripeSubscriptionId" VARCHAR(100),
+    "billingEmail" VARCHAR(255),
+    "billingCycle" VARCHAR(20) NOT NULL DEFAULT 'monthly',
+    "trialEndsAt" TIMESTAMP(3),
+    "currentPeriodStart" TIMESTAMP(3),
+    "currentPeriodEnd" TIMESTAMP(3),
+    "canceledAt" TIMESTAMP(3),
+    "status" VARCHAR(20) NOT NULL DEFAULT 'trialing',
+
+    CONSTRAINT "subscription_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -1035,7 +1068,6 @@ CREATE TABLE "pbx_domains" (
     "homeSwitch" VARCHAR(128),
     "menuId" UUID,
     "portalName" VARCHAR(128),
-    "tenantId" VARCHAR(50) NOT NULL,
 
     CONSTRAINT "pbx_domains_pkey" PRIMARY KEY ("id")
 );
@@ -1611,7 +1643,7 @@ CREATE TABLE "pbx_users" (
     "synchronised" TIMESTAMPTZ(6),
     "updatedBy" VARCHAR(64) NOT NULL,
     "domainId" UUID,
-    "auth_user_id" VARCHAR(50) NOT NULL,
+    "auth_user_id" VARCHAR(50),
 
     CONSTRAINT "pbx_users_pkey" PRIMARY KEY ("id")
 );
@@ -1818,10 +1850,10 @@ CREATE INDEX "auth_group_permissions_permissionId_idx" ON "auth_group_permission
 CREATE UNIQUE INDEX "auth_group_permissions_groupId_permissionId_key" ON "auth_group_permissions"("groupId", "permissionId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "tenants_name_key" ON "tenants"("name");
+CREATE UNIQUE INDEX "auth_tenant_name_key" ON "auth_tenant"("name");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "tenants_domain_key" ON "tenants"("domain");
+CREATE UNIQUE INDEX "auth_tenant_firebaseTenantId_key" ON "auth_tenant"("firebaseTenantId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "auth_user_uid_key" ON "auth_user"("uid");
@@ -1831,6 +1863,45 @@ CREATE UNIQUE INDEX "auth_user_email_key" ON "auth_user"("email");
 
 -- CreateIndex
 CREATE INDEX "auth_user_tenantId_idx" ON "auth_user"("tenantId");
+
+-- CreateIndex
+CREATE INDEX "auth_user_email_idx" ON "auth_user"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "invite_token_key" ON "invite"("token");
+
+-- CreateIndex
+CREATE INDEX "invite_email_idx" ON "invite"("email");
+
+-- CreateIndex
+CREATE INDEX "invite_token_idx" ON "invite"("token");
+
+-- CreateIndex
+CREATE INDEX "invite_domainId_idx" ON "invite"("domainId");
+
+-- CreateIndex
+CREATE INDEX "invite_groupId_idx" ON "invite"("groupId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "subscription_domainId_key" ON "subscription"("domainId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "subscription_slug_key" ON "subscription"("slug");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "subscription_stripeCustomerId_key" ON "subscription"("stripeCustomerId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "subscription_stripeSubscriptionId_key" ON "subscription"("stripeSubscriptionId");
+
+-- CreateIndex
+CREATE INDEX "subscription_slug_idx" ON "subscription"("slug");
+
+-- CreateIndex
+CREATE INDEX "subscription_status_idx" ON "subscription"("status");
+
+-- CreateIndex
+CREATE INDEX "subscription_stripeCustomerId_idx" ON "subscription"("stripeCustomerId");
 
 -- CreateIndex
 CREATE INDEX "auth_user_groups_groupId_idx" ON "auth_user_groups"("groupId");
@@ -2142,9 +2213,6 @@ CREATE INDEX "pbx_domains_name_idx" ON "pbx_domains"("name");
 CREATE INDEX "pbx_domains_portalName_idx" ON "pbx_domains"("portalName");
 
 -- CreateIndex
-CREATE INDEX "pbx_domains_tenantId_idx" ON "pbx_domains"("tenantId");
-
--- CreateIndex
 CREATE INDEX "pbx_email_templates_domain_id_id_592ee910" ON "pbx_email_templates"("domain_id_id");
 
 -- CreateIndex
@@ -2271,13 +2339,13 @@ CREATE UNIQUE INDEX "pbx_users_user_uuid_key" ON "pbx_users"("user_uuid");
 CREATE UNIQUE INDEX "pbx_users_username_key" ON "pbx_users"("username");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "pbx_users_auth_user_id_key" ON "pbx_users"("auth_user_id");
-
--- CreateIndex
 CREATE INDEX "pbx_users_domainId_idx" ON "pbx_users"("domainId");
 
 -- CreateIndex
 CREATE INDEX "pbx_users_username_idx" ON "pbx_users"("username");
+
+-- CreateIndex
+CREATE INDEX "pbx_users_auth_user_id_idx" ON "pbx_users"("auth_user_id");
 
 -- CreateIndex
 CREATE INDEX "pbx_voicemail_destinations_voicemail_id_id_31053e0d" ON "pbx_voicemail_destinations"("voicemail_id_id");
@@ -2307,7 +2375,16 @@ ALTER TABLE "auth_group_permissions" ADD CONSTRAINT "auth_group_permissions_perm
 ALTER TABLE "auth_group_permissions" ADD CONSTRAINT "auth_group_permissions_groupId_fkey" FOREIGN KEY ("groupId") REFERENCES "auth_group"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- AddForeignKey
-ALTER TABLE "auth_user" ADD CONSTRAINT "auth_user_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "tenants"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "auth_user" ADD CONSTRAINT "auth_user_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "auth_tenant"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "invite" ADD CONSTRAINT "invite_domainId_fkey" FOREIGN KEY ("domainId") REFERENCES "pbx_domains"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "invite" ADD CONSTRAINT "invite_groupId_fkey" FOREIGN KEY ("groupId") REFERENCES "auth_group"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "subscription" ADD CONSTRAINT "subscription_domainId_fkey" FOREIGN KEY ("domainId") REFERENCES "pbx_domains"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "auth_user_groups" ADD CONSTRAINT "auth_user_groups_groupId_fkey" FOREIGN KEY ("groupId") REFERENCES "auth_group"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
@@ -2479,9 +2556,6 @@ ALTER TABLE "pbx_dialplans" ADD CONSTRAINT "pbx_dialplans_domain_id_id_581e14be_
 
 -- AddForeignKey
 ALTER TABLE "pbx_domain_settings" ADD CONSTRAINT "pbx_domain_settings_domain_id_id_c7461c47_fk_pbx_domains_id" FOREIGN KEY ("domainId") REFERENCES "pbx_domains"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;
-
--- AddForeignKey
-ALTER TABLE "pbx_domains" ADD CONSTRAINT "pbx_domains_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "tenants"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "pbx_domains" ADD CONSTRAINT "pbx_domains_menu_id_id_e5f9f32c_fk_pbx_menus_id" FOREIGN KEY ("menuId") REFERENCES "pbx_menus"("id") ON DELETE NO ACTION ON UPDATE NO ACTION;

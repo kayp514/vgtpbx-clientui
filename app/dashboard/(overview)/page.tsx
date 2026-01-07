@@ -411,68 +411,6 @@ export default function DashboardOverview() {
               </div>
             </CardContent>
           </Card>
-
-          <Card className="shadow-sm border border-border/40">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg">Quick Access</CardTitle>
-              <CardDescription>Frequently used modules and features</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                {[
-                  { name: "Dashboard", icon: LayoutDashboard, href: "/dashboard" },
-                  { name: "Extensions", icon: Phone, href: "/dashboard/pbx/extensions" },
-                  { name: "Ring Groups", icon: Users, href: "/dashboard/pbx/ring-groups" },
-                  { name: "Call Routing", icon: PhoneForwarded, href: "/dashboard/pbx/call-routing" },
-                  { name: "Call History", icon: PhoneIncoming, href: "/dashboard/reports/call-history" },
-                  { name: "System Settings", icon: Settings, href: "/dashboard/system/settings" },
-                ].map((module) => (
-                  <Button
-                    key={module.name}
-                    variant="outline"
-                    className="h-auto py-6 flex flex-col items-center justify-center gap-2 hover:bg-muted/50"
-                    asChild
-                  >
-                    <a href={module.href}>
-                      <module.icon className="h-6 w-6 text-primary" />
-                      <span className="text-xs font-medium">{module.name}</span>
-                    </a>
-                  </Button>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="shadow-sm border border-border/40">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg">Quick Access</CardTitle>
-              <CardDescription>Frequently used modules and features</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                {[
-                  { name: "Dashboard", icon: LayoutDashboard, href: "/dashboard" },
-                  { name: "Extensions", icon: Phone, href: "/dashboard/pbx/extensions" },
-                  { name: "Ring Groups", icon: Users, href: "/dashboard/pbx/ring-groups" },
-                  { name: "Call Routing", icon: PhoneForwarded, href: "/dashboard/pbx/call-routing" },
-                  { name: "Call History", icon: PhoneIncoming, href: "/dashboard/reports/call-history" },
-                  { name: "System Settings", icon: Settings, href: "/dashboard/system/settings" },
-                ].map((module) => (
-                  <Button
-                    key={module.name}
-                    variant="outline"
-                    className="h-auto py-6 flex flex-col items-center justify-center gap-2 hover:bg-muted/50"
-                    asChild
-                  >
-                    <a href={module.href}>
-                      <module.icon className="h-6 w-6 text-primary" />
-                      <span className="text-xs font-medium">{module.name}</span>
-                    </a>
-                  </Button>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
         </div>
       </ContentSection>
     </DashboardContent>

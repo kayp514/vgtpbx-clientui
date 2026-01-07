@@ -1,17 +1,22 @@
 'use server'
 
-import { prisma } from '@/lib/prisma'
+import prisma from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
 import { createUserWithPbx, verifyAuthUser } from '@/lib/db/queries';
 
-import type { 
-  FirebaseAuthUser, 
+import type {
+  FirebaseAuthUser,
   SignUpResult,
   VerifyResult
 } from "@/lib/db/types"
 
-
-const DEFAULT_TENANT_ID = 'default'
+import {
+  createNextSessionCookie,
+  clearNextSessionCookie,
+  clearSessionCookieServer,
+  createSessionCookieServer,
+  setNextServerSession,
+} from "@tern-secure/nextjs/admin";
 
 
 export async function addExtension(formData: FormData) {
@@ -123,7 +128,7 @@ export async function createAuthPbxUser(
 
   } catch (error) {
     console.error('Error creating user:', error);
-    
+
 
     return {
       success: false,
@@ -147,6 +152,7 @@ export async function verifyAuthPbxUser(
     if (!verifyResult.exists || !verifyResult.user) {
       return {
         success: false,
+        needsOnboarding: true,
         error: {
           message: 'User not found in system',
           code: 404
@@ -159,6 +165,7 @@ export async function verifyAuthPbxUser(
     if (verifyResult.error) {
       return {
         success: false,
+        needsOnboarding: false,
         error: {
           message: verifyResult.error,
           code: 403
@@ -166,24 +173,59 @@ export async function verifyAuthPbxUser(
       };
     }
 
+    const hasPbxAccess = user.pbx_user && !user.pbx_user.disabled;
+    const hasDomain = user.pbx_user?.domainId != null;
+
+    if (!hasPbxAccess || !hasDomain) {
+      return {
+        success: true,
+        needsOnboarding: true,
+        data: {
+          auth: {
+            uid: user.uid,
+            email: user.email,
+            displayName: user.displayName,
+            disabled: user.disabled,
+            tenantId: user.tenantId
+          },
+          pbx: user.pbx_user ? {
+            id: user.pbx_user.id,
+            username: user.pbx_user.username,
+            status: user.pbx_user.status,
+            disabled: user.pbx_user.disabled,
+            domainId: user.pbx_user.domainId || undefined
+          } : undefined,
+          tenant: {
+            ...user.tenant,
+            name: user.tenant.name
+          }
+        }
+      };
+    }
+
+    const pbxUser = user.pbx_user!;
     return {
       success: true,
+      needsOnboarding: false,
       data: {
         auth: {
           uid: user.uid,
           email: user.email,
           displayName: user.displayName,
           disabled: user.disabled,
-          emailVerified: user.emailVerified,
           tenantId: user.tenantId
         },
-        pbx: user.pbx_user ? {
-          id: user.pbx_user.id,
-          username: user.pbx_user.username,
-          status: user.pbx_user.status,
-          disabled: user.pbx_user.disabled
-        } : undefined,
-        tenant: user.tenant
+        pbx: {
+          id: pbxUser.id,
+          username: pbxUser.username,
+          status: pbxUser.status,
+          disabled: pbxUser.disabled,
+          domainId: pbxUser.domainId || undefined
+        },
+        tenant: {
+          ...user.tenant,
+          name: user.tenant.name
+        }
       }
     };
 
@@ -192,6 +234,7 @@ export async function verifyAuthPbxUser(
 
     return {
       success: false,
+      needsOnboarding: false,
       error: {
         message: 'Failed to verify user',
         code: 500
@@ -199,3 +242,160 @@ export async function verifyAuthPbxUser(
     };
   }
 }
+
+
+interface OnboardingInput {
+  uid: string
+  email: string
+  tenantId: string
+  companyName: string
+  domain: string
+}
+
+interface OnboardingResult {
+  success: boolean
+  error?: {
+    message: string
+    code?: number
+  }
+  data?: {
+    tenant: {
+      id: string
+      name: string
+    }
+    domain: {
+      id: string
+      name: string
+    }
+  }
+}
+
+export async function completeOnboarding(input: OnboardingInput): Promise<OnboardingResult> {
+  const domainName = `${input.domain}.internal.vgtpbx.com`
+
+  try {
+    const existingDomain = await prisma.pbx_domains.findFirst({
+      where: {
+        OR: [
+          { name: domainName },
+          { portalName: input.domain }
+        ]
+      }
+    })
+
+    if (existingDomain) {
+      return {
+        success: false,
+        error: {
+          message: 'This domain is already taken. Please choose a different one.',
+          code: 409
+        }
+      }
+    }
+
+    const existingUser = await prisma.auth_user.findUnique({
+      where: { uid: input.uid }
+    })
+
+    if (!existingUser) {
+      return {
+        success: false,
+        error: {
+          message: 'User not found.',
+          code: 404
+        }
+      }
+    }
+
+    const result = await prisma.$transaction(async (tx) => {
+      const pbxDomain = await tx.pbx_domains.create({
+        data: {
+          id: crypto.randomUUID(),
+          name: domainName,
+          portalName: input.domain,
+          disabled: false,
+          updatedBy: 'system',
+          description: `PBX domain for ${input.companyName}`
+        }
+      })
+
+      const trialEndsAt = new Date()
+      trialEndsAt.setDate(trialEndsAt.getDate() + 14)
+
+      await tx.subscription.create({
+        data: {
+          domainId: pbxDomain.id,
+          slug: input.domain,
+          displayName: input.companyName,
+          plan: 'basic',
+          maxUsers: 5,
+          maxExtensions: 10,
+          billingEmail: input.email,
+          billingCycle: 'monthly',
+          status: 'trialing',
+          trialEndsAt
+        }
+      })
+
+      await tx.pbx_users.create({
+        data: {
+          user_uuid: crypto.randomUUID(),
+          username: input.email.split('@')[0],
+          email: input.email,
+          status: 'active',
+          disabled: false,
+          updatedBy: 'system',
+          domainId: pbxDomain.id,
+          auth_user_id: input.uid
+        }
+      })
+
+      return { pbxDomain }
+    })
+
+    return {
+      success: true,
+      data: {
+        tenant: {
+          id: input.tenantId,
+          name: input.companyName
+        },
+        domain: {
+          id: result.pbxDomain.id,
+          name: result.pbxDomain.name
+        }
+      }
+    }
+
+  } catch (error) {
+    console.error('Onboarding error:', error)
+
+    if (error instanceof Error && error.message.includes('Unique constraint')) {
+      return {
+        success: false,
+        error: {
+          message: 'This domain or username is already taken.',
+          code: 409
+        }
+      }
+    }
+
+    return {
+      success: false,
+      error: {
+        message: 'Failed to complete onboarding. Please try again.',
+        code: 500
+      }
+    }
+  }
+}
+
+
+
+export {
+  clearNextSessionCookie,
+  clearSessionCookieServer,
+  createSessionCookieServer,
+  setNextServerSession,
+  createNextSessionCookie,
+};
