@@ -346,6 +346,7 @@ export interface SignUpResult {
 export interface VerifyResult {
   success: boolean;
   needsOnboarding?: boolean;
+  slug?: string;
   data?: {
     auth: {
       uid: string;

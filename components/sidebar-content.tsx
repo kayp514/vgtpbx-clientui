@@ -24,7 +24,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { navigation } from "@/lib/navigation";
+import { getNavigation } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
 
 import { SidebarUserFooter } from "@/components/sidebarfooter";
@@ -37,6 +37,10 @@ export function SidebarContent() {
   const { user, userId, sessionClaims, signOut } = useAuth();
   const { state: sidebarState, toggleSidebar } = useSidebar();
   const isCollapsed = sidebarState === "collapsed";
+
+  // Extract slug from pathname (first segment after /)
+  const slug = pathname.split('/')[1] || 'dashboard';
+  const navigation = React.useMemo(() => getNavigation(slug), [slug]);
 
   const [expandedSections, setExpandedSections] = React.useState<
     Record<string, boolean>
@@ -93,8 +97,8 @@ export function SidebarContent() {
 
   // Check if a section is active (any of its items is active)
   const isActiveSection = (href: string) => {
-    if (href === "/dashboard") {
-      return pathname === "/dashboard";
+    if (href === `/${slug}`) {
+      return pathname === `/${slug}`;
     }
     return pathname.startsWith(href);
   };

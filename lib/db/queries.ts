@@ -432,7 +432,6 @@ export async function createUserOld(input: DatabaseUserInput | null) {
         isAdmin: true,
         isStaff: true,
         phoneNumber: true,
-        emailVerified: true,
         disabled: true,
         updatedAt: true,
         createdAt: true,

@@ -94,7 +94,8 @@ export function Onboarding({ currentUser }: OnboardingProps) {
       });
 
       if (result.success) {
-        router.replace("/dashboard");
+        const slug = result.slug || data.domain.trim().toLowerCase();
+        router.replace(`/${slug}`);
       } else {
         setError(result.error?.message || "Failed to complete setup");
       }

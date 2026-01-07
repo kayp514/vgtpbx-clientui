@@ -15,8 +15,5 @@ export default async function OnboardingPage() {
     tenantId: sessionClaims?.tenantId || null,
   };
 
-
-  return (
-    <Onboarding currentUser={currentUser} />
-  );
+  return <Onboarding currentUser={currentUser} />;
 }

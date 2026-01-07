@@ -25,7 +25,8 @@ export function Verify({ result }: VerifyProps) {
           setTimeout(() => router.replace("/onboarding"), 1000);
         } else {
           setState("success");
-          setTimeout(() => router.replace("/dashboard"), 500);
+          const slug = result.slug || "dashboard";
+          setTimeout(() => router.replace(`/${slug}`), 500);
         }
       } else {
         setState("error");

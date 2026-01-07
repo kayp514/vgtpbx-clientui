@@ -203,10 +203,17 @@ export async function verifyAuthPbxUser(
       };
     }
 
+    // Fetch subscription slug for multi-tenant routing
     const pbxUser = user.pbx_user!;
+    const subscription = await prisma.subscription.findUnique({
+      where: { domainId: pbxUser.domainId! },
+      select: { slug: true }
+    });
+
     return {
       success: true,
       needsOnboarding: false,
+      slug: subscription?.slug,
       data: {
         auth: {
           uid: user.uid,
@@ -254,6 +261,7 @@ interface OnboardingInput {
 
 interface OnboardingResult {
   success: boolean
+  slug?: string
   error?: {
     message: string
     code?: number
@@ -355,6 +363,7 @@ export async function completeOnboarding(input: OnboardingInput): Promise<Onboar
 
     return {
       success: true,
+      slug: input.domain,
       data: {
         tenant: {
           id: input.tenantId,
@@ -387,6 +396,20 @@ export async function completeOnboarding(input: OnboardingInput): Promise<Onboar
         code: 500
       }
     }
+  }
+}
+
+export async function validateSlug(slug: string): Promise<boolean> {
+  try {
+    const subscription = await prisma.subscription.findUnique({
+      where: { slug },
+      select: { id: true }
+    });
+
+    return !!subscription;
+  } catch (error) {
+    console.error('Error validating slug:', error);
+    return false;
   }
 }
 
