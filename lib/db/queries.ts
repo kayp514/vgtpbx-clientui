@@ -1,6 +1,6 @@
 import type {
-  AuthUserFull, 
-  DatabaseUserInput, 
+  AuthUserFull,
+  DatabaseUserInput,
   Extension,
   ExtensionCreateInput,
   ExtensionUpdateInput,
@@ -37,13 +37,13 @@ import type {
   PbxUserCreateInput,
   PbxUserUpdateInput,
   PbxUserDisplay,
-  PbxUserFull,  
+  PbxUserFull,
 } from "@/lib/db/types"
-import { 
-  AUTH_USER_DEFAULTS, 
-  DEFAULT_EXTENSION_VALUES, 
+import {
+  AUTH_USER_DEFAULTS,
+  DEFAULT_EXTENSION_VALUES,
   EXTENSION_USER_DEFAULTS,
-  EMAIL_TEMPLATE_DEFAULTS, 
+  EMAIL_TEMPLATE_DEFAULTS,
   GATEWAY_DEFAULTS,
   DOMAIN_DEFAULTS,
   DOMAIN_SETTING_DEFAULTS,
@@ -56,13 +56,13 @@ import {
   PBX_USER_SETTING_DEFAULTS,
 } from '@/lib/db/types'
 
-import { prisma } from '@/lib/prisma';
+import prisma from '@/lib/prisma';
 
 
 const isDevelopment = process.env.NODE_ENV === 'development'
 
-const API_BASE_URL = isDevelopment 
-  ? 'http://localhost:3000' 
+const API_BASE_URL = isDevelopment
+  ? 'http://localhost:3000'
   : process.env.NEXT_PUBLIC_API_URL || 'https://vgtpbx.dev'
 
 
@@ -73,19 +73,18 @@ interface VerifyAuthUserResult {
     email: string;
     displayName: string | null;
     disabled: boolean;
-    emailVerified: boolean;
     tenantId: string;
     pbx_user?: {
       id: bigint;
       username: string;
       status: string;
       disabled: boolean;
+      domainId?: string | null;
     };
     tenant: {
       id: string;
+      name: string;
       disabled: boolean;
-      plan: string;
-      maxUsers: number;
     };
   } | null;
   error?: string;
@@ -94,7 +93,7 @@ interface VerifyAuthUserResult {
 
 export async function createUserWithPbx(
   authInput: DatabaseUserInput,
-  pbxInput?: Partial<PbxUserCreateInput> 
+  pbxInput?: Partial<PbxUserCreateInput>
 ): Promise<{
   authUser: AuthUserFull;
   pbxUser: PbxUserFull;
@@ -137,9 +136,9 @@ export async function createUserWithPbx(
         }
       });
 
-      return { 
-        authUser, 
-        pbxUser 
+      return {
+        authUser,
+        pbxUser
       };
     });
   } catch (error) {
@@ -190,7 +189,6 @@ export async function verifyAuthUser(
         email: true,
         displayName: true,
         disabled: true,
-        emailVerified: true,
         tenantId: true,
         pbx_users: {
           select: {
@@ -198,6 +196,7 @@ export async function verifyAuthUser(
             username: true,
             disabled: true,
             status: true,
+            domainId: true,
           }
         },
         auth_tenant: {
@@ -205,8 +204,6 @@ export async function verifyAuthUser(
             id: true,
             name: true,
             disabled: true,
-            plan: true,
-            maxUsers: true,
           }
         }
       }
@@ -220,37 +217,35 @@ export async function verifyAuthUser(
       };
     }
 
+    if (user.auth_tenant.disabled) {
+      return {
+        exists: false,
+        user: null,
+        error: 'Tenant is disabled'
+      };
+    }
+
+    const pbxUser = user.pbx_users && user.pbx_users.length > 0 ? user.pbx_users[0] : undefined;
+
     const transformedUser = {
       uid: user.uid,
       email: user.email,
       displayName: user.displayName,
       disabled: user.disabled,
-      emailVerified: user.emailVerified,
       tenantId: user.tenantId,
-      pbx_user: user.pbx_users || undefined,
+      pbx_user: pbxUser ? {
+        id: pbxUser.id,
+        username: pbxUser.username,
+        status: pbxUser.status,
+        disabled: pbxUser.disabled,
+        domainId: pbxUser.domainId,
+      } : undefined,
       tenant: {
         id: user.auth_tenant.id,
+        name: user.auth_tenant.name,
         disabled: user.auth_tenant.disabled,
-        plan: user.auth_tenant.plan,
-        maxUsers: user.auth_tenant.maxUsers
       }
     };
-
-    if (user.auth_tenant.disabled) {
-      return {
-        exists: true,
-        user: transformedUser,
-        error: 'User does not belong to this tenant'
-      };
-    }
-
-    if (!user.emailVerified) {
-      return {
-        exists: true,
-        user: transformedUser,
-        error: 'Email not verified'
-      };
-    }
 
     return {
       exists: true,
@@ -348,7 +343,7 @@ export async function createPbxUser(input: PbxUserCreateInput): Promise<PbxUserF
 
 
 export async function PbxupdateUser(
-  id: bigint, 
+  id: bigint,
   data: PbxUserUpdateInput
 ): Promise<PbxUserFull> {
   try {
@@ -390,88 +385,87 @@ export async function PbxdeleteUser(id: bigint): Promise<void> {
 }
 
 
-  
+
 export async function createUserOld(input: DatabaseUserInput | null) {
-      console.log("user: createUser received input:", input); 
-    if (!input) {
-      console.error("user: Input is null in createUser");
-      throw new Error("User input data is required")
-    }
-  
-  
-    try {
-      // Create a sanitized version of the input data
-      const sanitizedData = {
-          uid: input.uid,
-          email: input.email.toLowerCase(),
-          displayName: input.displayName,
-          firstName: input.firstName,
-          lastName: input.lastName,
-          avatar: input.avatar,
-          tenantId: input.tenantId,
-          isSuperuser: input.isSuperuser,
-          isAdmin: input.isAdmin,
-          isStaff: input.isStaff,
-          phoneNumber: input.phoneNumber,
-          emailVerified: input.emailVerified,
-          disabled: input.disabled,
-          createdAt: input.createdAt,
-          lastSignInAt: input.lastSignInAt,
-          updatedAt: new Date(),
-        }
-  
-      console.log("user: Cleaned user data:", sanitizedData)
-  
-  
-      const user = await prisma.auth_user.create({
-        data: sanitizedData,
-        select: {
-          uid: true,
-          email: true,
-          displayName: true,
-          firstName: true,
-          lastName: true,
-          avatar: true,
-          tenantId: true,
-          isSuperuser: true,
-          isAdmin: true,
-          isStaff: true,
-          phoneNumber: true,
-          emailVerified: true,
-          disabled: true,
-          updatedAt: true,
-          createdAt: true,
-          lastSignInAt: true,
-        },
-      })
-  
-      if (!user) {
-        throw new Error("Failed to create user: No user returned from database")
-      }
-  
-      console.log("Prisma create operation returned:", user); 
-  
-      return user
-    } catch (error) {
-      console.error("Detailed error in createUser:", {
-          error,
-          errorMessage: error instanceof Error ? error.message : "Unknown error",
-          errorStack: error instanceof Error ? error.stack : undefined,
-        })
-      if (error instanceof Error) {
-        if (error.message.includes("Unique constraint")) {
-          throw new Error("User with this email or uid already exists")
-        }
-        if (error.message.includes("Foreign key constraint")) {
-          throw new Error("Invalid tenant ID")
-        }
-        throw new Error(`Failed to create user: ${error.message}`)
-      }
-      throw new Error("Failed to create user: Unknown error")
-    }
+  console.log("user: createUser received input:", input);
+  if (!input) {
+    console.error("user: Input is null in createUser");
+    throw new Error("User input data is required")
   }
-  
-  
+
+
+  try {
+    // Create a sanitized version of the input data
+    const sanitizedData = {
+      uid: input.uid,
+      email: input.email.toLowerCase(),
+      displayName: input.displayName,
+      firstName: input.firstName,
+      lastName: input.lastName,
+      avatar: input.avatar,
+      tenantId: input.tenantId,
+      isSuperuser: input.isSuperuser,
+      isAdmin: input.isAdmin,
+      isStaff: input.isStaff,
+      phoneNumber: input.phoneNumber,
+      emailVerified: input.emailVerified,
+      disabled: input.disabled,
+      createdAt: input.createdAt,
+      lastSignInAt: input.lastSignInAt,
+      updatedAt: new Date(),
+    }
+
+    console.log("user: Cleaned user data:", sanitizedData)
+
+
+    const user = await prisma.auth_user.create({
+      data: sanitizedData,
+      select: {
+        uid: true,
+        email: true,
+        displayName: true,
+        firstName: true,
+        lastName: true,
+        avatar: true,
+        tenantId: true,
+        isSuperuser: true,
+        isAdmin: true,
+        isStaff: true,
+        phoneNumber: true,
+        disabled: true,
+        updatedAt: true,
+        createdAt: true,
+        lastSignInAt: true,
+      },
+    })
+
+    if (!user) {
+      throw new Error("Failed to create user: No user returned from database")
+    }
+
+    console.log("Prisma create operation returned:", user);
+
+    return user
+  } catch (error) {
+    console.error("Detailed error in createUser:", {
+      error,
+      errorMessage: error instanceof Error ? error.message : "Unknown error",
+      errorStack: error instanceof Error ? error.stack : undefined,
+    })
+    if (error instanceof Error) {
+      if (error.message.includes("Unique constraint")) {
+        throw new Error("User with this email or uid already exists")
+      }
+      if (error.message.includes("Foreign key constraint")) {
+        throw new Error("Invalid tenant ID")
+      }
+      throw new Error(`Failed to create user: ${error.message}`)
+    }
+    throw new Error("Failed to create user: Unknown error")
+  }
+}
+
+
 export async function verifyDatabaseUser(uid: string): Promise<{
   success: boolean;
   user?: {
@@ -497,11 +491,10 @@ export async function verifyDatabaseUser(uid: string): Promise<{
         displayName: true,
         tenantId: true,
         isAdmin: true,
-        emailVerified: true,
         disabled: true,
       }
     })
-    
+
     if (!dbUser) {
       return {
         success: false,
@@ -511,7 +504,7 @@ export async function verifyDatabaseUser(uid: string): Promise<{
         }
       }
     }
-    
+
     if (dbUser.disabled) {
       return {
         success: false,
@@ -521,7 +514,7 @@ export async function verifyDatabaseUser(uid: string): Promise<{
         }
       }
     }
-    
+
     return {
       success: true,
       user: dbUser
@@ -537,8 +530,8 @@ export async function verifyDatabaseUser(uid: string): Promise<{
     }
   }
 }
-  
-  
+
+
 
 export async function listDomains(): Promise<DomainDisplay[]> {
   try {
@@ -599,7 +592,7 @@ export async function createDomain(input: DomainCreateInput): Promise<Domain> {
 
 
 export async function updateDomain(
-  id: string, 
+  id: string,
   data: DomainUpdateInput
 ): Promise<Domain> {
   try {
@@ -697,7 +690,7 @@ export async function createAccessControl(input: AccessControlCreateInput): Prom
 
 
 export async function updateAccessControl(
-  id: string, 
+  id: string,
   data: AccessControlUpdateInput
 ): Promise<AccessControl> {
   try {
@@ -788,7 +781,7 @@ export async function createEmailTemplate(
 
 
 export async function updateEmailTemplate(
-  id: string, 
+  id: string,
   data: EmailTemplateUpdateInput
 ): Promise<EmailTemplate> {
   try {
@@ -828,7 +821,7 @@ export async function listExtensions(): Promise<ExtensionDisplay[]> {
         user_context: true,
         disabled: true,
       },
-      orderBy : { created: 'desc' }
+      orderBy: { created: 'desc' }
     });
   } catch (error) {
     throw new Error(error instanceof Error ? error.message : 'Failed to fetch extensions');
@@ -855,7 +848,7 @@ export async function createExtension(
     const { users, ...extensionData } = input;
 
     return await prisma.pbx_extensions.create({
-       data: {
+      data: {
         ...DEFAULT_EXTENSION_VALUES,
         ...extensionData,
         pbx_extension_users: users ? {
@@ -864,18 +857,18 @@ export async function createExtension(
             ...user,
           })),
         } : undefined,
-       },
-       include: {
+      },
+      include: {
         pbx_extension_users: true,
       }
-      });
+    });
   } catch (error) {
     throw new Error(error instanceof Error ? error.message : 'Failed to create extension');
   }
 }
 
 export async function updateExtension(
-  id: string, 
+  id: string,
   data: ExtensionUpdateInput
 ): Promise<Extension> {
   try {
@@ -883,7 +876,7 @@ export async function updateExtension(
 
     return await prisma.pbx_extensions.update({
       where: { id },
-      data :{
+      data: {
         ...extensionData,
         updated: new Date(),
         updated_by: data.updated_by || 'system',
@@ -893,7 +886,7 @@ export async function updateExtension(
             ...EXTENSION_USER_DEFAULTS,
             ...user,
           })),
-        }: undefined,
+        } : undefined,
       },
       include: {
         pbx_extension_users: true,
@@ -977,7 +970,7 @@ export async function createGateway(input: GatewayCreateInput): Promise<Gateway>
 }
 
 export async function updateGateway(
-  id: string, 
+  id: string,
   data: GatewayUpdateInput
 ): Promise<Gateway> {
   try {
@@ -1051,7 +1044,7 @@ export async function createModule(input: ModuleCreateInput): Promise<Module> {
 
 
 export async function updateModule(
-  id: string, 
+  id: string,
   data: ModuleUpdateInput
 ): Promise<Module> {
   try {
@@ -1127,7 +1120,7 @@ export async function createVariable(input: VariableCreateInput): Promise<Variab
 }
 
 export async function updateVariable(
-  id: string, 
+  id: string,
   data: VariableUpdateInput
 ): Promise<Variable> {
   try {
@@ -1207,7 +1200,7 @@ export async function createTenant(input: TenantCreateInput): Promise<Tenant> {
 
 
 export async function updateTenant(
-  id: string, 
+  id: string,
   data: TenantUpdateInput
 ): Promise<Tenant> {
   try {

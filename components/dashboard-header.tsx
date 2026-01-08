@@ -2,8 +2,6 @@
 
 import { usePathname } from "next/navigation"
 import { BreadcrumbNav } from "@/components/breadcrumb-nav"
-import { Button } from "@/components/ui/button"
-import { Bell, HelpCircle, Search } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { MobileNav } from "@/components/mobile-nav"
 import { ModeToggle } from "@/components/mode-toggle"
