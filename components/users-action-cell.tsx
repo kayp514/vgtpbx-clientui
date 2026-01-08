@@ -21,7 +21,6 @@ import {
 } from "lucide-react";
 import type { AuthUsers } from "@/lib/db/types";
 import { toast } from "sonner";
-import { EditUserDialog } from "@/components/users-dialog";
 
 interface UserActionsCellProps {
   user: AuthUsers;

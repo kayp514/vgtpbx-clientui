@@ -9,6 +9,7 @@ import {
   type ColumnDef,
   type SortingState,
   type VisibilityState,
+  type RowSelectionState,
 } from "@tanstack/react-table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -25,12 +26,17 @@ import { EmptySpace } from "@/components/empty-space";
 import { PageWrapper } from "@/components/page-layout";
 import { UsersSearch } from "@/components/search";
 import { UsersHeader } from "@/components/headers";
+import { EditCreateUserDialog } from "@/components/users-dialog";
 
 interface UsersTableProps {
   columns: ColumnDef<AuthUsers>[];
   data: AuthUsers[];
   globalFilter: string;
   onGlobalFilterChange: (value: string) => void;
+  filterRole: string;
+  onFilterRoleChange: (role: string) => void;
+  filterStatus: string;
+  onFilterStatusChange: (status: string) => void;
   isLoading?: boolean;
 }
 
@@ -39,35 +45,79 @@ export function UsersTable({
   data,
   globalFilter,
   onGlobalFilterChange,
+  filterRole,
+  onFilterRoleChange,
+  filterStatus,
+  onFilterStatusChange,
   isLoading,
 }: UsersTableProps) {
   const [sorting, setSorting] = useState<SortingState>([]);
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
     uid: false,
     role: false,
   });
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [userToEdit, setUserToEdit] = useState<AuthUsers | null>(null);
 
   const table = useReactTable({
     data,
     columns,
     onSortingChange: setSorting,
+    onRowSelectionChange: setRowSelection,
     onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     state: {
       sorting,
+      rowSelection,
       columnVisibility,
     },
+    enableRowSelection: true,
     manualPagination: true,
   });
 
+  const selectedRows = table.getFilteredSelectedRowModel().rows;
+  const selectedCount = selectedRows.length;
+
+  const openCreateForm = () => {
+    setUserToEdit(null);
+    setIsFormOpen(true);
+  };
+
+  const handleCreateUser = async (userData: Partial<AuthUsers>) => {
+    console.log('Create user:', userData);
+    setIsFormOpen(false);
+  };
+
+  const handleUpdateUser = async (userData: Partial<AuthUsers>) => {
+    console.log('Update user:', userToEdit?.uid, userData);
+    setIsFormOpen(false);
+  };
+
+  const handleBulkDelete = () => {
+    console.log(
+      "Delete users:",
+      selectedRows.map((row) => row.original.uid)
+    );
+    table.resetRowSelection();
+  };
+
   return (
     <PageWrapper>
-      <UsersHeader />
+      <UsersHeader
+        selectedCount={selectedCount}
+        onCreateUser={openCreateForm}
+        onBulkDelete={handleBulkDelete}
+      />
       <UsersSearch
         table={table}
         globalFilter={globalFilter}
         setGlobalFilter={onGlobalFilterChange}
+        filterRole={filterRole}
+        setFilterRole={onFilterRoleChange}
+        filterStatus={filterStatus}
+        setFilterStatus={onFilterStatusChange}
         disabled={isLoading}
       />
       <Card>
@@ -148,6 +198,14 @@ export function UsersTable({
           </div>
         </CardContent>
       </Card>
+      
+      <EditCreateUserDialog
+        open={isFormOpen}
+        onOpenChange={setIsFormOpen}
+        user={userToEdit}
+        onCreateUser={handleCreateUser}
+        onUpdateUser={handleUpdateUser}
+      />
     </PageWrapper>
   );
 }

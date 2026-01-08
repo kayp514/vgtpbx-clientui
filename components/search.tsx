@@ -47,8 +47,6 @@ interface UsersSearchProps {
   globalFilter: string;
   setGlobalFilter: (value: string) => void;
   disabled?: boolean;
-  searchQuery: string;
-  setSearchQuery: (query: string) => void;
   filterRole: string;
   setFilterRole: (role: string) => void;
   filterStatus: string;
@@ -184,8 +182,6 @@ export function UsersSearch({
   globalFilter,
   setGlobalFilter,
   disabled = false,
-  searchQuery,
-  setSearchQuery,
   filterRole,
   setFilterRole,
   filterStatus,
@@ -199,8 +195,9 @@ export function UsersSearch({
           type="search"
           placeholder="Search users..."
           className="pl-8 w-full"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          value={globalFilter ?? ""}
+          onChange={(event) => setGlobalFilter(String(event.target.value))}
+          disabled={disabled}
         />
       </div>
 
