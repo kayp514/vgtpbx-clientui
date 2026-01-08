@@ -5,6 +5,7 @@ import { revalidatePath } from 'next/cache'
 import { createUserWithPbx, verifyAuthUser } from '@/lib/db/queries';
 
 import type {
+  DomainUser,
   FirebaseAuthUser,
   SignUpResult,
   VerifyResult
@@ -17,6 +18,7 @@ import {
   createSessionCookieServer,
   setNextServerSession,
 } from "@tern-secure/nextjs/admin";
+import { listUsersByDomainSlug, getSlugByUserId } from '@/lib/db/queries_v2';
 
 
 export async function addExtension(formData: FormData) {
@@ -410,6 +412,26 @@ export async function validateSlug(slug: string): Promise<boolean> {
   } catch (error) {
     console.error('Error validating slug:', error);
     return false;
+  }
+}
+
+
+
+export async function listUsersByDomain(slug: string): Promise<DomainUser[]> {
+  try {
+    return await listUsersByDomainSlug(slug);
+  } catch (error) {
+    console.error('Error listing users by domain:', error);
+    return [];
+  }
+}
+
+export async function getUserSlug(uid: string): Promise<string | null> {
+  try {
+    return await getSlugByUserId(uid);
+  } catch (error) {
+    console.error('Error getting user slug:', error);
+    return null;
   }
 }
 

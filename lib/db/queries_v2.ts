@@ -1,5 +1,5 @@
 import prisma from '@/lib/prisma';
-import type { CreateAuthUserInput, AuthUserWithTenant } from '@/lib/db/types';
+import type { CreateAuthUserInput, AuthUserWithTenant, DomainUser } from '@/lib/db/types';
 
 
 export async function createAuthUser(data: CreateAuthUserInput): Promise<AuthUserWithTenant> {
@@ -146,4 +146,79 @@ export async function consumeInvite(token: string, usedAt: Date = new Date()) {
             pbx_domain: true,
         },
     });
+}
+
+// ============================================================================
+// DOMAIN USER QUERIES
+// ============================================================================
+
+
+export async function listUsersByDomainSlug(slug: string): Promise<DomainUser[]> {
+    const subscription = await prisma.subscription.findUnique({
+        where: { slug },
+        select: { domainId: true }
+    });
+
+    if (!subscription) {
+        return [];
+    }
+
+    const pbxUsers = await prisma.pbx_users.findMany({
+        where: {
+            domainId: subscription.domainId
+        },
+        include: {
+            auth_user: {
+                select: {
+                    uid: true,
+                    displayName: true,
+                    firstName: true,
+                    lastName: true,
+                    email: true,
+                    avatar: true,
+                    phoneNumber: true,
+                    isAdmin: true,
+                    isStaff: true,
+                    isSuperuser: true,
+                    disabled: true
+                }
+            }
+        },
+        orderBy: {
+            created: 'desc'
+        }
+    });
+
+    return pbxUsers.map(user => ({
+        id: user.id,
+        user_uuid: user.user_uuid,
+        username: user.username,
+        email: user.email,
+        status: user.status,
+        disabled: user.disabled,
+        created: user.created,
+        auth: user.auth_user
+    }));
+}
+
+/**
+ * Get subscription slug for a user by their uid
+ * Used when we need to determine which domain a user belongs to
+ */
+export async function getSlugByUserId(uid: string): Promise<string | null> {
+    const pbxUser = await prisma.pbx_users.findFirst({
+        where: { auth_user_id: uid },
+        select: {
+            domainId: true,
+            pbx_domains: {
+                select: {
+                    subscription: {
+                        select: { slug: true }
+                    }
+                }
+            }
+        }
+    });
+
+    return pbxUser?.pbx_domains?.subscription?.slug ?? null;
 }

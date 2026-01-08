@@ -1,58 +1,77 @@
-"use client"
+"use client";
 
-import { Input } from "@/components/ui/input"
-import { Search } from "lucide-react"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { availablePlans } from "@/lib/mock-data"
-import type { TenantOption } from "@/lib/db/types"
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuCheckboxItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { availablePlans } from "@/lib/mock-data";
+import type { TenantOption } from "@/lib/db/types";
+import type { Table } from "@tanstack/react-table";
+import type { AuthUsers } from "@/lib/db/types";
+import { Search, Columns } from "lucide-react";
 
 interface ExtensionsSearchProps {
-  searchQuery: string
-  setSearchQuery: (query: string) => void
+  searchQuery: string;
+  setSearchQuery: (query: string) => void;
 }
 
 interface GatewaySearchProps {
-    searchQuery: string
-    setSearchQuery: (query: string) => void
+  searchQuery: string;
+  setSearchQuery: (query: string) => void;
 }
 
 interface SipProfilesSearchProps {
-  searchQuery: string
-  setSearchQuery: (query: string) => void
+  searchQuery: string;
+  setSearchQuery: (query: string) => void;
 }
 
-
 interface BridgeSearchProps {
-  searchQuery: string
-  setSearchQuery: (query: string) => void
+  searchQuery: string;
+  setSearchQuery: (query: string) => void;
 }
 
 interface UsersSearchProps {
-  searchQuery: string
-  setSearchQuery: (query: string) => void
-  filterRole: string
-  setFilterRole: (role: string) => void
-  filterStatus: string
-  setFilterStatus: (status: string) => void
+  table: Table<AuthUsers>;
+  globalFilter: string;
+  setGlobalFilter: (value: string) => void;
+  disabled?: boolean;
+  searchQuery: string;
+  setSearchQuery: (query: string) => void;
+  filterRole: string;
+  setFilterRole: (role: string) => void;
+  filterStatus: string;
+  setFilterStatus: (status: string) => void;
 }
 
 interface TenantSearchProps {
-  searchQuery: string
-  setSearchQuery: (query: string) => void
-  filterStatus: string
-  setFilterStatus: (status: string) => void
-  filterPlan: string
-  setFilterPlan: (plan: string) => void
+  searchQuery: string;
+  setSearchQuery: (query: string) => void;
+  filterStatus: string;
+  setFilterStatus: (status: string) => void;
+  filterPlan: string;
+  setFilterPlan: (plan: string) => void;
 }
 
 interface DomainSearchProps {
-  searchQuery: string
-  setSearchQuery: (query: string) => void
-  filterTenant: string
-  setFilterTenant: (tenant: string) => void
-  filterStatus: string
-  setFilterStatus: (status: string) => void
-  tenantOptions: TenantOption[]
+  searchQuery: string;
+  setSearchQuery: (query: string) => void;
+  filterTenant: string;
+  setFilterTenant: (tenant: string) => void;
+  filterStatus: string;
+  setFilterStatus: (status: string) => void;
+  tenantOptions: TenantOption[];
 }
 
 export function DomainSearch({
@@ -104,7 +123,7 @@ export function DomainSearch({
         </Select>
       </div>
     </div>
-  )
+  );
 }
 
 export function TenantSearch({
@@ -157,10 +176,14 @@ export function TenantSearch({
         </Select>
       </div>
     </div>
-  )
+  );
 }
 
 export function UsersSearch({
+  table,
+  globalFilter,
+  setGlobalFilter,
+  disabled = false,
   searchQuery,
   setSearchQuery,
   filterRole,
@@ -206,11 +229,56 @@ export function UsersSearch({
           </SelectContent>
         </Select>
       </div>
+      <div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="outline"
+              className="ml-auto bg-transparent"
+              disabled={disabled}
+            >
+              <Columns className="mr-2 h-4 w-4" />
+              Columns
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-[200px]">
+            <DropdownMenuSeparator />
+            {table
+              .getAllColumns()
+              .filter((column) => column.getCanHide())
+              .map((column) => {
+                return (
+                  <DropdownMenuCheckboxItem
+                    key={column.id}
+                    className="capitalize"
+                    checked={column.getIsVisible()}
+                    onCheckedChange={(value) =>
+                      column.toggleVisibility(!!value)
+                    }
+                  >
+                    {column.id === "uid"
+                      ? "User ID"
+                      : column.id === "createdAt"
+                      ? "Created"
+                      : column.id === "lastSignInAt"
+                      ? "Last Sign In"
+                      : column.id === "disabled"
+                      ? "Status"
+                      : column.id}
+                  </DropdownMenuCheckboxItem>
+                );
+              })}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
     </div>
-  )
+  );
 }
 
-export function BridgeSearch({ searchQuery, setSearchQuery }: BridgeSearchProps) {
+export function BridgeSearch({
+  searchQuery,
+  setSearchQuery,
+}: BridgeSearchProps) {
   return (
     <div className="flex items-center gap-2">
       <div className="relative flex-1 max-w-md">
@@ -224,10 +292,13 @@ export function BridgeSearch({ searchQuery, setSearchQuery }: BridgeSearchProps)
         />
       </div>
     </div>
-  )
+  );
 }
 
-export function ExtensionsSearch({ searchQuery, setSearchQuery }: ExtensionsSearchProps) {
+export function ExtensionsSearch({
+  searchQuery,
+  setSearchQuery,
+}: ExtensionsSearchProps) {
   return (
     <div className="flex items-center gap-2">
       <div className="relative flex-1 max-w-md">
@@ -241,42 +312,45 @@ export function ExtensionsSearch({ searchQuery, setSearchQuery }: ExtensionsSear
         />
       </div>
     </div>
-  )
+  );
 }
 
-
-export function GatewaySearch({ searchQuery, setSearchQuery }: GatewaySearchProps) {
-    return (
-      <div className="flex items-center gap-2">
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            type="search"
-            placeholder="Search gateways..."
-            className="pl-8 w-full"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
+export function GatewaySearch({
+  searchQuery,
+  setSearchQuery,
+}: GatewaySearchProps) {
+  return (
+    <div className="flex items-center gap-2">
+      <div className="relative flex-1 max-w-md">
+        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+        <Input
+          type="search"
+          placeholder="Search gateways..."
+          className="pl-8 w-full"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
       </div>
-    )
-  }
+    </div>
+  );
+}
 
-
-  export function SipProfilesSearch({ searchQuery, setSearchQuery }: SipProfilesSearchProps) {
-    return (
-      <div className="flex items-center gap-2">
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            type="search"
-            placeholder="Search SIP profiles..."
-            className="pl-8 w-full"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
+export function SipProfilesSearch({
+  searchQuery,
+  setSearchQuery,
+}: SipProfilesSearchProps) {
+  return (
+    <div className="flex items-center gap-2">
+      <div className="relative flex-1 max-w-md">
+        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+        <Input
+          type="search"
+          placeholder="Search SIP profiles..."
+          className="pl-8 w-full"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
       </div>
-    )
-  }
-
+    </div>
+  );
+}

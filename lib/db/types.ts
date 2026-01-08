@@ -790,6 +790,7 @@ export interface AuthUsers {
   email: string;
   firstName: string;
   lastName: string;
+  phoneNumber: string | null;
   disabled: boolean;
   isAdmin: boolean;
   isStaff: boolean;
@@ -806,7 +807,7 @@ export interface tenant {
   description?: string;
   plan: string;
   maxUsers: number;
-  disabled: Boolean
+  disabled: boolean
 }
 
 export interface TenantCreateInput {
@@ -822,11 +823,7 @@ export interface TenantCreateInput {
 export type TenantDisplay = Pick<Tenant,
   | 'id'
   | 'name'
-  | 'domain'
   | 'description'
-  | 'logo'
-  | 'plan'
-  | 'maxUsers'
   | 'disabled'
 >;
 
@@ -865,3 +862,26 @@ export type AuthUserWithTenant = auth_user & {
   auth_tenant: auth_tenant;
 };
 
+
+export interface DomainUser {
+  id: bigint;
+  user_uuid: string;
+  username: string;
+  email: string | null;
+  status: string;
+  disabled: boolean;
+  created: Date | null;
+  auth: {
+    uid: string;
+    displayName: string | null;
+    firstName: string | null;
+    lastName: string | null;
+    email: string;
+    avatar: string | null;
+    phoneNumber: string | null;
+    isAdmin: boolean;
+    isStaff: boolean;
+    isSuperuser: boolean;
+    disabled: boolean;
+  } | null;
+}

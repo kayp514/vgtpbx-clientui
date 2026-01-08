@@ -31,7 +31,7 @@ export function Verify({ result }: VerifyProps) {
       } else {
         setState("error");
       }
-    }, 1500);
+    }, 300);
 
     return () => clearTimeout(timer);
   }, [result, router]);

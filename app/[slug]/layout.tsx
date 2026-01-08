@@ -6,11 +6,11 @@ import { Toaster } from "@/components/ui/sonner";
 
 interface LayoutProps {
   children: React.ReactNode;
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }
 
 export default async function Layout({ children, params }: LayoutProps) {
-  const { slug } = params;
+  const { slug } = await params;
   const isValid = await validateSlug(slug);
 
   if (!isValid) {
