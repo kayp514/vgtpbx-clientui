@@ -20,6 +20,7 @@ import {
 } from "@tern-secure/nextjs/admin";
 import { listUsersByDomainSlug, getSlugByUserId } from '@/lib/db/queries_v2';
 import { publishSwitchProvisioning } from '@/utils/RestPubSub';
+import type { PbxDomain, SwitchStatus } from '@/lib/provisioning';
 
 
 export async function addExtension(formData: FormData) {
@@ -449,6 +450,87 @@ export async function getUserSlug(uid: string): Promise<string | null> {
   }
 }
 
+
+/**
+ * Get provisioning status for a domain by slug
+ */
+export async function getProvisioningStatus(slug: string): Promise<PbxDomain | null> {
+  try {
+    const subscription = await prisma.subscription.findUnique({
+      where: { slug },
+      select: {
+        domainId: true,
+        pbx_domain: {
+          select: {
+            id: true,
+            name: true,
+            homeSwitch: true,
+            switchStatus: true,
+            ipAddress: true,
+          }
+        }
+      }
+    });
+
+    if (!subscription?.pbx_domain) {
+      return null;
+    }
+
+    const domain = subscription.pbx_domain;
+    return {
+      id: domain.id,
+      domainName: domain.name,
+      status: domain.switchStatus as SwitchStatus,
+      homeSwitch: domain.homeSwitch,
+      ipAddress: domain.ipAddress,
+    };
+  } catch (error) {
+    console.error('Error getting provisioning status:', error);
+    return null;
+  }
+}
+
+
+/**
+ * Trigger provisioning (or re-provisioning) for a domain
+ * Used when status is failed or for manual retry
+ */
+export async function triggerProvisioning(domainId: string): Promise<{ success: boolean; error?: string }> {
+  try {
+    // Get domain and subscription info
+    const domain = await prisma.pbx_domains.findUnique({
+      where: { id: domainId },
+      select: {
+        id: true,
+        subscription: {
+          select: { slug: true }
+        }
+      }
+    });
+
+    if (!domain || !domain.subscription) {
+      return { success: false, error: 'Domain not found' };
+    }
+
+    // Update status to pending
+    await prisma.pbx_domains.update({
+      where: { id: domainId },
+      data: { switchStatus: 'pending' }
+    });
+
+    // Publish provisioning message
+    await publishSwitchProvisioning({
+      domainId: domain.id,
+      slug: domain.subscription.slug,
+      tenantId: '' // tenantId will be resolved by Cloud Run if needed
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error('Error triggering provisioning:', error);
+    return { success: false, error: 'Failed to trigger provisioning' };
+  }
+}
 
 
 export {

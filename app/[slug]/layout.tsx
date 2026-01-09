@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { validateSlug } from "@/app/actions";
 import { DashboardLayout } from "@/components/dashboard-layout";
 import { ThemeProvider } from "@/components/theme-provider";
+import { ProvisioningProvider } from "@/ctx/ProvisionCtxProvider";
 import { Toaster } from "@/components/ui/sonner";
 
 interface LayoutProps {
@@ -24,10 +25,12 @@ export default async function Layout({ children, params }: LayoutProps) {
       enableSystem
       disableTransitionOnChange
     >
-      <DashboardLayout>
-        {children}
-        <Toaster position="top-center" />
-      </DashboardLayout>
+      <ProvisioningProvider>
+        <DashboardLayout>
+          {children}
+          <Toaster position="top-center" />
+        </DashboardLayout>
+      </ProvisioningProvider>
     </ThemeProvider>
   );
 }
