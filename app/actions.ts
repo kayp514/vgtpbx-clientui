@@ -19,6 +19,7 @@ import {
   setNextServerSession,
 } from "@tern-secure/nextjs/admin";
 import { listUsersByDomainSlug, getSlugByUserId } from '@/lib/db/queries_v2';
+import { publishSwitchProvisioning } from '@/utils/RestPubSub';
 
 
 export async function addExtension(formData: FormData) {
@@ -362,6 +363,19 @@ export async function completeOnboarding(input: OnboardingInput): Promise<Onboar
 
       return { pbxDomain }
     })
+
+    try {
+      await publishSwitchProvisioning({
+        domainId: result.pbxDomain.id,
+        slug: input.domain,
+        tenantId: input.tenantId
+      });
+      console.log('Switch provisioning message published for domain:', result.pbxDomain.id);
+    } catch (pubsubError) {
+      // Log but don't fail onboarding if Pub/Sub publish fails
+      // The provisioning can be retried manually or via a background job
+      console.error('Failed to publish switch provisioning message:', pubsubError);
+    }
 
     return {
       success: true,
