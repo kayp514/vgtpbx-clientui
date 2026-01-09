@@ -3,10 +3,34 @@
 import type { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import { XCircle, CheckCircle2 } from "lucide-react";
 import type { AuthUsers } from "@/lib/db/types";
+import { getUserRoles } from "@/utils/user-utils";
 
 export const usersColumns: ColumnDef<AuthUsers>[] = [
+  {
+    id: "select",
+    header: ({ table }) => (
+      <Checkbox
+        checked={
+          table.getIsAllPageRowsSelected() ||
+          (table.getIsSomePageRowsSelected() && "indeterminate")
+        }
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        aria-label="Select all"
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        aria-label="Select row"
+      />
+    ),
+    enableSorting: false,
+    enableHiding: false,
+  },
   {
     accessorKey: "email",
     header: ({ column }) => {
@@ -81,6 +105,62 @@ export const usersColumns: ColumnDef<AuthUsers>[] = [
     enableHiding: true,
   },
   {
+    id: "role",
+    header: "Role",
+    cell: ({ row }) => {
+      const user = row.original;
+      const roles = getUserRoles(user);
+      
+      return (
+        <div className="flex flex-wrap gap-1">
+          {roles.map((role) => {
+            switch (role) {
+              case "admin":
+                return (
+                  <Badge
+                    key={role}
+                    className="bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300 border-purple-200 dark:border-purple-800"
+                  >
+                    Admin
+                  </Badge>
+                );
+              case "superuser":
+                return (
+                  <Badge
+                    key={role}
+                    className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300 border-blue-200 dark:border-blue-800"
+                  >
+                    Superuser
+                  </Badge>
+                );
+              case "staff":
+                return (
+                  <Badge
+                    key={role}
+                    className="bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300 border-amber-200 dark:border-amber-800"
+                  >
+                    Staff
+                  </Badge>
+                );
+              case "member":
+                return (
+                  <Badge
+                    key={role}
+                    className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 border-green-200 dark:border-green-800"
+                  >
+                    Member
+                  </Badge>
+                );
+              default:
+                return <Badge key={role}>{role}</Badge>;
+            }
+          })}
+        </div>
+      );
+    },
+    enableHiding: true,
+  },
+  {
     accessorKey: "disabled",
     header: "Status",
     cell: ({ row }) => {
@@ -112,7 +192,7 @@ export const usersColumns: ColumnDef<AuthUsers>[] = [
   {
     id: "actions",
     header: "Actions",
-    cell: ({ row }) => {
+    cell: () => {
       return null;
     },
     enableHiding: false,
