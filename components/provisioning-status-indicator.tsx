@@ -24,7 +24,7 @@ export function ProvisioningStatusIndicator() {
 
   const message = getStatusMessage(pbxDomain.status);
   const label = getStatusLabel(pbxDomain.status);
-  const isReady = pbxDomain.status === "ready";
+  const isReady = pbxDomain.status === "provisioned";
   const isFailed = pbxDomain.status === "failed";
   const isPending = pbxDomain.status === "pending";
   const inProgress = isProvisioningInProgress(pbxDomain.status);

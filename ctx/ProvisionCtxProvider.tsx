@@ -1,6 +1,12 @@
-"use client"
+"use client";
 
-import { createContext, useContext, useState, useCallback, useEffect } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  useEffect,
+} from "react";
 import { useParams } from "next/navigation";
 import type { PbxDomain } from "@/lib/provisioning";
 import { getProvisioningStatus } from "@/app/actions";
@@ -18,13 +24,13 @@ export const ProvisioningCtx = createContext<
 function ProvisioningProvider({ children }: { children: React.ReactNode }) {
   const params = useParams();
   const slug = params?.slug as string | undefined;
-  
+
   const [pbxDomain, setPbxDomain] = useState<PbxDomain | null>(null);
   const [isChecking, setIsChecking] = useState(false);
 
   const refreshStatus = useCallback(async () => {
     if (!slug) return;
-    
+
     setIsChecking(true);
     try {
       const status = await getProvisioningStatus(slug);
@@ -36,7 +42,6 @@ function ProvisioningProvider({ children }: { children: React.ReactNode }) {
     }
   }, [slug]);
 
-  // Load initial status on mount
   useEffect(() => {
     if (slug) {
       refreshStatus();

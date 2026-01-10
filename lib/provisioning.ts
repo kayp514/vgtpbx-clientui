@@ -1,6 +1,6 @@
 
 
-export type SwitchStatus = "pending" | "provisioning" | "ready" | "failed"
+export type SwitchStatus = "pending" | "provisioning" | "provisioned" | "failed"
 
 
 export interface PbxDomain {
@@ -18,7 +18,7 @@ export function getStatusMessage(status: SwitchStatus): string {
             return "Your PBX is queued for provisioning"
         case "provisioning":
             return "Setting up your PBX infrastructure..."
-        case "ready":
+        case "provisioned":
             return "Your PBX is ready to use"
         case "failed":
             return "Provisioning failed. Please contact support or retry."
@@ -34,7 +34,7 @@ export function getStatusLabel(status: SwitchStatus): string {
             return "Pending"
         case "provisioning":
             return "Setting up"
-        case "ready":
+        case "provisioned":
             return "Ready"
         case "failed":
             return "Failed"

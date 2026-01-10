@@ -39,7 +39,6 @@ export function ProvisioningButton() {
     }
   };
 
-  // Only show retry button when provisioning has failed
   if (!isFailed) {
     return null;
   }
