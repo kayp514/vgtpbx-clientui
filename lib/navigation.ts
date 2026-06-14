@@ -256,5 +256,44 @@ export function getNavigation(slug: string): NavItem[] {
         },
       ],
     },
+
+    // Switch Section
+    {
+      name: "Switch",
+      icon: Network,
+      hasSubmenu: true,
+      section: "switch",
+      roles: ["admin", "superuser"],
+      submenu: [
+        {
+          name: "Overview",
+          href: `/${slug}/switch`,
+          icon: BarChart3,
+          roles: ["admin", "superuser"],
+          permission: "switch.overview",
+        },
+        {
+          name: "Active Channels",
+          href: `/${slug}/switch/channels`,
+          icon: Phone,
+          roles: ["admin", "superuser"],
+          permission: "switch.channels",
+        },
+        {
+          name: "Registrations",
+          href: `/${slug}/switch/registrations`,
+          icon: Users,
+          roles: ["admin", "superuser"],
+          permission: "switch.registrations",
+        },
+        {
+          name: "Calls",
+          href: `/${slug}/switch/calls`,
+          icon: PhoneCall,
+          roles: ["admin", "superuser"],
+          permission: "switch.calls",
+        },
+      ],
+    },
   ];
 }

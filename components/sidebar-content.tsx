@@ -39,7 +39,7 @@ export function SidebarContent() {
   const isCollapsed = sidebarState === "collapsed";
 
   // Extract slug from pathname (first segment after /)
-  const slug = pathname.split('/')[1] || 'dashboard';
+  const slug = pathname.split("/")[1] || "dashboard";
   const navigation = React.useMemo(() => getNavigation(slug), [slug]);
 
   const [expandedSections, setExpandedSections] = React.useState<
@@ -91,6 +91,7 @@ export function SidebarContent() {
   const settingsItems = navigation.filter(
     (item) => item.section === "settings"
   );
+  const switchItems = navigation.filter((item) => item.section === "switch");
 
   // Check if a path is active
   const isActive = (href: string) => pathname === href;
@@ -311,6 +312,7 @@ export function SidebarContent() {
           {renderSection(siptrunksItems, "siptrunks")}
           {renderSection(reportsItems, "reports")}
           {renderSection(settingsItems, "settings")}
+          {renderSection(switchItems, "switch")}
         </div>
       </SidebarContentPrimitive>
 

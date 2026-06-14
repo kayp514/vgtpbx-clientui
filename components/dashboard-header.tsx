@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { usePathname } from "next/navigation";
 import { BreadcrumbNav } from "@/components/breadcrumb-nav";
 import { cn } from "@/lib/utils";
 import { MobileNav } from "@/components/mobile-nav";
 import { ModeToggle } from "@/components/mode-toggle";
 import { ProvisioningStatusIndicator } from "@/components/provisioning-status-indicator";
+import { ProvisioningStatusIndicatorNew } from "./provisioning-status-indicator-new";
 import {
   FlushCacheButton,
   ReloadAclButton,
@@ -23,7 +23,6 @@ interface HeaderProps {
 type ActionType = "flushCache" | "reloadAcl" | "reloadXml" | "refresh";
 
 export function Header({ className }: HeaderProps) {
-  const pathname = usePathname();
   const [isLoading, setIsLoading] = useState({
     flushCache: false,
     reloadAcl: false,
@@ -69,6 +68,7 @@ export function Header({ className }: HeaderProps) {
       </div>
 
       <div className="flex items-center gap-2">
+        <ProvisioningStatusIndicatorNew />
         <ProvisioningStatusIndicator />
 
         <Separator orientation="vertical" className="h-6 hidden sm:block" />
