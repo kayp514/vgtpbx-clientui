@@ -539,7 +539,6 @@ export async function listDomains(): Promise<DomainDisplay[]> {
       select: {
         id: true,
         name: true,
-        tenantId: true,
         portalName: true,
         homeSwitch: true,
         description: true,
@@ -619,6 +618,42 @@ export async function updateDomain(
   } catch (error) {
     throw new Error(error instanceof Error ? error.message : 'Failed to update domain');
   }
+}
+
+/**
+ * Update domain switch provisioning status
+ * Used by Cloud Run provisioning service to update homeSwitch, switchStatus, ipAddress
+ */
+export async function updateDomainSwitchStatus(
+  id: string,
+  data: {
+    switchStatus: string;
+    homeSwitch?: string;
+    ipAddress?: string;
+  }
+): Promise<{
+  id: string;
+  name: string;
+  homeSwitch: string | null;
+  switchStatus: string;
+  ipAddress: string | null;
+}> {
+  return await prisma.pbx_domains.update({
+    where: { id },
+    data: {
+      switchStatus: data.switchStatus,
+      ...(data.homeSwitch !== undefined && { homeSwitch: data.homeSwitch }),
+      ...(data.ipAddress !== undefined && { ipAddress: data.ipAddress }),
+      updated: new Date(),
+    },
+    select: {
+      id: true,
+      name: true,
+      homeSwitch: true,
+      switchStatus: true,
+      ipAddress: true,
+    },
+  });
 }
 
 export async function deleteDomain(id: string): Promise<void> {
