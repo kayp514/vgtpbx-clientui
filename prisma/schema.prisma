@@ -17,6 +17,7 @@ model auth_group {
   pbx_contacts_groups               pbx_contacts_groups[]
   pbx_device_vendor_function_groups pbx_device_vendor_function_groups[]
   pbx_menu_item_groups              pbx_menu_item_groups[]
+  pbx_users                         pbx_users[]
 
   @@index([name], map: "auth_group_name_idx")
 }
@@ -84,7 +85,6 @@ model auth_user {
   auth_user_groups           auth_user_groups[]
   auth_user_user_permissions auth_user_user_permissions[]
   authtoken_token            authtoken_token?
-  pbx_users                  pbx_users[]
 
   @@index([tenantId])
   @@index([email])
@@ -1898,20 +1898,27 @@ model pbx_user_settings {
 // pbx_users: Links auth_user to pbx_domain with role
 // - A user can belong to multiple domains (via multiple pbx_users records)
 // - role: owner, admin, member
+// pbx_users: membership of a Firebase account in a domain.
+// The only table that refers to Firebase users (firebaseUid).
+// - member: account lives in the domain's own Firebase tenant (homeTenantId = domain tenant)
+// - guest: account lives in another tenant (homeTenantId = that tenant); never admin
+// status: invited | active | disabled
 model pbx_users {
   id                        BigInt                      @id @default(autoincrement())
   user_uuid                 String                      @unique @db.Uuid
-  username                  String                      @unique @db.VarChar(150)
-  email                     String?                     @db.VarChar(254)
+  username                  String                      @db.VarChar(150)
+  email                     String                      @db.VarChar(254)
   status                    String                      @db.VarChar(32)
   api_key                   String?                     @db.VarChar(254)
-  disabled                  Boolean                     @default(false)
   created                   DateTime?                   @db.Timestamptz(6)
   updated                   DateTime?                   @db.Timestamptz(6)
   synchronised              DateTime?                   @db.Timestamptz(6)
   updatedBy                 String                      @db.VarChar(64)
-  domainId                  String?                     @db.Uuid
-  auth_user_id              String?                     @db.VarChar(50)
+  domainId                  String                      @db.Uuid
+  firebaseUid               String?                     @db.VarChar(128)
+  homeTenantId              String?                     @db.VarChar(128)
+  userType                  String                      @default("member") @db.VarChar(16)
+  groupId                   Int?
   pbx_call_centre_agents    pbx_call_centre_agents[]
   pbx_conference_room_users pbx_conference_room_users[]
   pbx_contacts              pbx_contacts[]
@@ -1919,12 +1926,16 @@ model pbx_users {
   pbx_extension_users       pbx_extension_users[]
   pbx_ring_group_users      pbx_ring_group_users[]
   pbx_user_settings         pbx_user_settings[]
-  pbx_domains               pbx_domains?                @relation(fields: [domainId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  auth_user                 auth_user?                  @relation(fields: [auth_user_id], references: [uid], onDelete: NoAction, onUpdate: NoAction)
+  pbx_domains               pbx_domains                 @relation(fields: [domainId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  auth_group                auth_group?                 @relation(fields: [groupId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
+  @@unique([domainId, firebaseUid])
+  @@unique([domainId, email])
+  @@unique([domainId, username])
   @@index([domainId])
   @@index([username])
-  @@index([auth_user_id])
+  @@index([firebaseUid])
+  @@index([groupId])
 }
 
 model pbx_vars {
