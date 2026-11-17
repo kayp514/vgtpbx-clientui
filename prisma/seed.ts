@@ -1,5 +1,5 @@
 import { PrismaClient } from '../prisma/pbx-database-client-types/client'
-import { DOMAIN_DEFAULTS, TENANT_DEFAULTS } from '../lib/db/types'
+import { DOMAIN_DEFAULTS } from '../lib/db/types'
 import {
   defaultAccessControlNodes,
   defaultAccessControls,
@@ -14,17 +14,15 @@ const prisma = new PrismaClient()
 
 async function seed() {
   try {
-    // Create default tenant
-    const defaultTenant = await prisma.auth_tenant.upsert({
-      where: { id: 'default' },
-      update: {},
-      create: {
-        id: 'default',
-        name: 'default',
-        description: 'Default tenant for system',
-        ...TENANT_DEFAULTS,
-      },
-    })
+    // Role catalogue
+    const roles: Record<string, { id: number }> = {}
+    for (const name of ['admin', 'user', 'agent']) {
+      roles[name] = await prisma.auth_group.upsert({
+        where: { name },
+        update: {},
+        create: { name },
+      })
+    }
 
     const defaultDomain = await prisma.pbx_domains.upsert({
       where: { name: 'pbx.lifesprintcare.ca' },
@@ -33,6 +31,9 @@ async function seed() {
         ...DOMAIN_DEFAULTS,
         name: 'pbx.lifesprintcare.ca',
         description: 'Default system domain',
+        // Placeholder for the development database only. Real domains get
+        // their Firebase tenant ID at onboarding (VGT-27).
+        firebaseTenantId: 'dev-default-tenant',
       }
     })
 
@@ -325,8 +326,8 @@ async function seed() {
     }
 
 
-    console.log('Seeded:', { 
-      defaultTenant, 
+    console.log('Seeded:', {
+      roles: Object.keys(roles).join(', '),
       defaultDomain,
       accessControls: 'Access Controls seeded',
       sipProfiles: 'SIP Profiles seeded',
