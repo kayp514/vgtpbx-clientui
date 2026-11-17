@@ -11,105 +11,12 @@ datasource db {
 model auth_group {
   id                                Int                                 @id @default(autoincrement())
   name                              String                              @unique @db.VarChar(150)
-  auth_group_permissions            auth_group_permissions[]
-  auth_user_groups                  auth_user_groups[]
-  invites                           invite[]
   pbx_contacts_groups               pbx_contacts_groups[]
   pbx_device_vendor_function_groups pbx_device_vendor_function_groups[]
   pbx_menu_item_groups              pbx_menu_item_groups[]
   pbx_users                         pbx_users[]
 
   @@index([name], map: "auth_group_name_idx")
-}
-
-model auth_permission {
-  id                         Int                          @id @default(autoincrement())
-  name                       String                       @db.VarChar(255)
-  codename                   String                       @db.VarChar(100)
-  auth_group_permissions     auth_group_permissions[]
-  auth_user_user_permissions auth_user_user_permissions[]
-
-  @@unique([codename], map: "auth_permission_codename_unique")
-}
-
-model auth_group_permissions {
-  id              BigInt          @id @default(autoincrement())
-  groupId         Int
-  permissionId    Int
-  auth_permission auth_permission @relation(fields: [permissionId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  auth_group      auth_group      @relation(fields: [groupId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-
-  @@unique([groupId, permissionId])
-  @@index([groupId])
-  @@index([permissionId])
-}
-
-// auth_tenant: Firebase authentication isolation
-// - "default" = Tier 1-2 users (Firebase tenantId = null)
-// - Custom ID = Tier 3 users (isolated Firebase tenant)
-model auth_tenant {
-  id               String   @id @db.VarChar(50) // "default" or Firebase tenantId
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-  name             String   @unique @db.VarChar(100)
-  description      String?  @db.VarChar(500)
-  firebaseTenantId String?  @unique @db.VarChar(50) // null = default pool
-  disabled         Boolean  @default(false)
-
-  users auth_user[]
-}
-
-// auth_user: Firebase authenticated user (created by Cloud Function on Firebase onCreate)
-// - tenantId: Firebase auth isolation ("default" for Tier 1-2, custom for Tier 3)
-// - pbx_users: Links to PBX domains (can be in multiple domains)
-model auth_user {
-  uid          String    @id @unique @db.VarChar(50)
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-  email        String    @unique @db.VarChar(255)
-  displayName  String?   @db.VarChar(100)
-  firstName    String?   @db.VarChar(150)
-  lastName     String?   @db.VarChar(150)
-  avatar       String?   @db.VarChar(255)
-  isSuperuser  Boolean   @default(false)
-  isAdmin      Boolean   @default(false)
-  isStaff      Boolean   @default(false)
-  phoneNumber  String?   @db.VarChar(20)
-  disabled     Boolean   @default(false)
-  lastSignInAt DateTime?
-
-  tenantId    String      @default("default") @db.VarChar(50)
-  auth_tenant auth_tenant @relation(fields: [tenantId], references: [id])
-
-  // Relations
-  auth_user_groups           auth_user_groups[]
-  auth_user_user_permissions auth_user_user_permissions[]
-  authtoken_token            authtoken_token?
-
-  @@index([tenantId])
-  @@index([email])
-}
-
-// invite: Pending invitations to join a pbx_domain
-// - Owner/admin creates invite with email + target group
-// - Invited user signs up, invite is consumed, pbx_users + auth_user_groups record created
-model invite {
-  id        String    @id @default(dbgenerated("'inv_' || gen_random_uuid()")) @db.VarChar(50)
-  email     String    @db.VarChar(255)
-  domainId  String    @db.Uuid
-  groupId   Int // Which auth_group to assign (admin, user, etc.)
-  token     String    @unique @db.VarChar(100)
-  expiresAt DateTime
-  usedAt    DateTime?
-  createdBy String    @db.VarChar(50) // uid of inviter
-  createdAt DateTime  @default(now())
-
-  auth_group auth_group @relation(fields: [groupId], references: [id])
-
-  @@index([email])
-  @@index([token])
-  @@index([domainId])
-  @@index([groupId])
 }
 
 model subscription {
@@ -139,39 +46,6 @@ model subscription {
   @@index([slug])
   @@index([status])
   @@index([stripeCustomerId])
-}
-
-model auth_user_groups {
-  id         BigInt     @id @default(autoincrement())
-  uid        String
-  groupId    Int
-  auth_group auth_group @relation(fields: [groupId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  auth_user  auth_user  @relation(fields: [uid], references: [uid], onDelete: NoAction, onUpdate: NoAction)
-
-  @@unique([uid, groupId])
-  @@index([groupId])
-  @@index([uid])
-}
-
-model auth_user_user_permissions {
-  id              BigInt          @id @default(autoincrement())
-  uid             String
-  permissionId    Int
-  auth_permission auth_permission @relation(fields: [permissionId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  auth_user       auth_user       @relation(fields: [uid], references: [uid], onDelete: NoAction, onUpdate: NoAction)
-
-  @@unique([uid, permissionId])
-  @@index([permissionId])
-  @@index([uid])
-}
-
-model authtoken_token {
-  key       String    @id @db.VarChar(40)
-  created   DateTime  @db.Timestamptz(6)
-  uid       String    @unique @db.VarChar(50)
-  auth_user auth_user @relation(fields: [uid], references: [uid], onDelete: NoAction, onUpdate: NoAction)
-
-  @@index([key])
 }
 
 /// This model has constraints using non-default deferring rules and requires additional setup for migrations. Visit https://pris.ly/d/constraint-deferring for more info.
