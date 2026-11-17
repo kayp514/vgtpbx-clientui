@@ -1,6 +1,4 @@
 import type {
-  auth_user,
-  auth_tenant,
   pbx_access_controls,
   pbx_access_control_nodes,
   pbx_extensions,
@@ -19,11 +17,8 @@ import type {
   pbx_user_settings,
 } from '@/prisma/pbx-database-client-types/client';
 
-export interface AuthUserFull extends auth_user { }
-
 export interface PbxUserFull extends pbx_users {
   pbx_user_settings: PbxUserSettingFull[];
-  auth_user: auth_user;
 }
 
 export interface PbxUserSettingFull extends pbx_user_settings { }
@@ -55,27 +50,16 @@ export interface SipProfileSettingFull extends pbx_sip_profile_settings { }
 export interface EmailTemplate extends pbx_email_templates { }
 export interface Module extends pbx_modules { }
 export interface Variable extends pbx_vars { }
-export interface Tenant extends auth_tenant { }
 
 
 
 export type UserRole = "admin" | "superuser" | "member"
-
-/**
- *  emailVerified has been removed
- */
-export const AUTH_USER_DEFAULTS = {
-  //emailVerified: false,
-  isStaff: false,
-  updatedAt: new Date(),
-} as const;
 
 export const PBX_USER_DEFAULTS = {
   user_uuid: crypto.randomUUID(),
   created: new Date(),
   updated: new Date(),
   updatedBy: 'system',
-  disabled: false,
   status: 'active',
 } as const;
 
@@ -83,12 +67,6 @@ export const PBX_USER_SETTING_DEFAULTS = {
   created: new Date(),
   updated: new Date(),
   updated_by: 'system',
-  disabled: false,
-} as const;
-
-export const TENANT_DEFAULTS = {
-  createdAt: new Date(),
-  updatedAt: new Date(),
   disabled: false,
 } as const;
 
@@ -222,31 +200,16 @@ export interface FirebaseAuthUser {
 }
 
 
-export interface DatabaseUserInput {
-  uid: string
-  email: string
-  displayName?: string | null
-  firstName?: string | null
-  lastName?: string | null
-  avatar: string | null
-  tenantId: string
-  isSuperuser: boolean
-  isAdmin: boolean
-  isStaff: boolean
-  disabled: boolean
-  phoneNumber?: string | null
-  emailVerified: boolean
-  createdAt?: Date | null
-  lastSignInAt: Date | null
-}
-
 export interface PbxUserCreateInput {
   username: string;
-  email?: string;
+  email: string;
   status: string;
   api_key?: string;
-  domainId?: string;
-  auth_user_id: string;  // Required - links to existing auth_user
+  domainId: string;
+  firebaseUid?: string;
+  homeTenantId?: string;
+  userType?: string;
+  groupId?: number;
   settings?: PbxUserSettingCreateInput[];
 }
 
@@ -259,21 +222,18 @@ export interface PbxUserSettingCreateInput {
   description?: string;
 }
 
+// TODO(VGT-32): the user list page joins Firebase profile data (name, photo)
+// to these membership rows on the server.
 export type PbxUserDisplay = Pick<PbxUserFull,
   | 'id'
   | 'user_uuid'
   | 'username'
   | 'email'
   | 'status'
-  | 'disabled'
-> & {
-  auth_user: Pick<auth_user,
-    | 'displayName'
-    | 'firstName'
-    | 'lastName'
-    | 'avatar'
-  >
-};
+  | 'userType'
+  | 'firebaseUid'
+  | 'groupId'
+>;
 
 export type PbxUserSettingDisplay = Pick<PbxUserSettingFull,
   | 'id'
@@ -285,7 +245,7 @@ export type PbxUserSettingDisplay = Pick<PbxUserSettingFull,
   | 'description'
 >;
 
-export type PbxUserUpdateInput = Partial<Omit<PbxUserFull, 'id' | 'created' | 'user_uuid' | 'auth_user' | 'pbx_user_settings'>> & {
+export type PbxUserUpdateInput = Partial<Omit<PbxUserFull, 'id' | 'created' | 'user_uuid' | 'pbx_user_settings'>> & {
   updated?: Date;
   updatedBy?: string;
   settings?: PbxUserSettingCreateInput[];
@@ -329,18 +289,6 @@ export interface SignUpResultOld {
     code: string
     message: string
   }
-}
-
-export interface SignUpResult {
-  success: boolean;
-  data?: {
-    auth: AuthUserFull;
-    pbx: PbxUserFull;
-  };
-  error?: {
-    message: string;
-    code?: number;
-  };
 }
 
 export interface VerifyResult {
@@ -784,6 +732,15 @@ export type AccessControlNodeUpdateInput = Partial<Omit<AccessControlNode, 'id' 
 };
 
 
+
+
+
+// v2
+
+
+
+
+// Display shape used by the user list components.
 export interface AuthUsers {
   uid: string;
   displayName: string;
@@ -797,91 +754,21 @@ export interface AuthUsers {
   isSuperuser: boolean;
 }
 
-
-export interface tenant {
-  id: string;
-  createdAt: Date;
-  updatedAt: Date;
-  name: string;
-  domain?: string
-  description?: string;
-  plan: string;
-  maxUsers: number;
-  disabled: boolean
-}
-
-export interface TenantCreateInput {
-  id: string;
-  name: string;
-  domain: string;
-  description?: string;
-  logo?: string;
-  plan?: string;
-  maxUsers?: number;
-}
-
-export type TenantDisplay = Pick<Tenant,
-  | 'id'
-  | 'name'
-  | 'description'
-  | 'disabled'
->;
-
-export type TenantUpdateInput = Partial<Omit<Tenant, 'id' | 'createdAt'>> & {
-  updatedAt?: Date;
-};
-
-
 export interface TenantOption {
   id: string
   name: string
 }
 
-
-// v2
-
-
-export interface CreateAuthUserInput {
-  uid: string;
-  email: string;
-  displayName?: string | null;
-  firstName?: string | null;
-  lastName?: string | null;
-  avatar?: string | null;
-  phoneNumber?: string | null;
-  tenantId?: string;
-  isSuperuser?: boolean;
-  isAdmin?: boolean;
-  isStaff?: boolean;
-  disabled?: boolean;
-  lastSignInAt: Date | null;
-  createdAt: Date | null;
-}
-
-export type AuthUserWithTenant = auth_user & {
-  auth_tenant: auth_tenant;
-};
-
-
+// TODO(VGT-32): the user list page fetches name and photo from Firebase on
+// the server and merges them into this shape.
 export interface DomainUser {
   id: bigint;
   user_uuid: string;
   username: string;
-  email: string | null;
+  email: string;
   status: string;
-  disabled: boolean;
+  userType: string;
+  firebaseUid: string | null;
+  groupId: number | null;
   created: Date | null;
-  auth: {
-    uid: string;
-    displayName: string | null;
-    firstName: string | null;
-    lastName: string | null;
-    email: string;
-    avatar: string | null;
-    phoneNumber: string | null;
-    isAdmin: boolean;
-    isStaff: boolean;
-    isSuperuser: boolean;
-    disabled: boolean;
-  } | null;
 }

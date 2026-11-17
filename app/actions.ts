@@ -2,12 +2,8 @@
 
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { createUserWithPbx, verifyAuthUser } from "@/lib/db/queries";
-
 import type {
   DomainUser,
-  FirebaseAuthUser,
-  SignUpResult,
   VerifyResult,
 } from "@/lib/db/types";
 
@@ -61,190 +57,20 @@ export async function addExtension(formData: FormData) {
   }
 }
 
-export async function createAuthPbxUser(
-  firebaseUser: FirebaseAuthUser,
-): Promise<SignUpResult> {
-  try {
-    const verifyResult = await verifyAuthUser(
-      firebaseUser.uid,
-      firebaseUser.email,
-    );
-
-    if (verifyResult.exists) {
-      return {
-        success: false,
-        error: { message: "User already exists" },
-      };
-    }
-
-    const authUserData = {
-      uid: firebaseUser.uid,
-      email: firebaseUser.email,
-      displayName: firebaseUser.displayName,
-      avatar: firebaseUser.photoURL || null,
-      phoneNumber: firebaseUser.phoneNumber || null,
-      emailVerified: firebaseUser.emailVerified,
-      tenantId: firebaseUser.tenantId,
-      disabled: false,
-      isAdmin: false,
-      isSuperuser: false,
-      isStaff: false,
-      createdAt: new Date(firebaseUser.metadata.creationTime || Date.now()),
-      lastSignInAt: new Date(
-        firebaseUser.metadata.lastSignInTime || Date.now(),
-      ),
-    };
-
-    const pbxUserData = {
-      username: firebaseUser.email.split("@")[0],
-      email: firebaseUser.email,
-      status: "active",
-      disabled: false,
-      updatedBy: "system",
-      settings: [
-        {
-          category: "preferences",
-          subcategory: "general",
-          value_type: "string",
-          value: "default",
-          sequence: 1,
-          enabled: true,
-        },
-      ],
-    };
-
-    const { authUser, pbxUser } = await createUserWithPbx(
-      authUserData,
-      pbxUserData,
-    );
-
-    return {
-      success: true,
-      data: {
-        auth: authUser,
-        pbx: pbxUser,
-      },
-    };
-  } catch (error) {
-    console.error("Error creating user:", error);
-
-    return {
-      success: false,
-      error: {
-        message: "Failed to create user",
-        code: 500,
-      },
-    };
-  }
-}
-
+// TODO(VGT-16): the member or guest access check on every request replaces
+// this lookup. It read the old auth tables, which no longer exist.
 export async function verifyAuthPbxUser(
-  uid: string,
-  tenantId: string,
+  _uid: string,
+  _tenantId: string,
 ): Promise<VerifyResult> {
-  try {
-    const verifyResult = await verifyAuthUser(uid, tenantId);
-
-    if (!verifyResult.exists || !verifyResult.user) {
-      return {
-        success: false,
-        needsOnboarding: true,
-        error: {
-          message: "User not found in system",
-          code: 404,
-        },
-      };
-    }
-
-    const { user } = verifyResult;
-
-    if (verifyResult.error) {
-      return {
-        success: false,
-        needsOnboarding: false,
-        error: {
-          message: verifyResult.error,
-          code: 403,
-        },
-      };
-    }
-
-    const hasPbxAccess = user.pbx_user && !user.pbx_user.disabled;
-    const hasDomain = user.pbx_user?.domainId != null;
-
-    if (!hasPbxAccess || !hasDomain) {
-      return {
-        success: true,
-        needsOnboarding: true,
-        data: {
-          auth: {
-            uid: user.uid,
-            email: user.email,
-            displayName: user.displayName,
-            disabled: user.disabled,
-            tenantId: user.tenantId,
-          },
-          pbx: user.pbx_user
-            ? {
-                id: user.pbx_user.id,
-                username: user.pbx_user.username,
-                status: user.pbx_user.status,
-                disabled: user.pbx_user.disabled,
-                domainId: user.pbx_user.domainId || undefined,
-              }
-            : undefined,
-          tenant: {
-            ...user.tenant,
-            name: user.tenant.name,
-          },
-        },
-      };
-    }
-
-    // Fetch subscription slug for multi-tenant routing
-    const pbxUser = user.pbx_user!;
-    const subscription = await prisma.subscription.findUnique({
-      where: { domainId: pbxUser.domainId! },
-      select: { slug: true },
-    });
-
-    return {
-      success: true,
-      needsOnboarding: false,
-      slug: subscription?.slug,
-      data: {
-        auth: {
-          uid: user.uid,
-          email: user.email,
-          displayName: user.displayName,
-          disabled: user.disabled,
-          tenantId: user.tenantId,
-        },
-        pbx: {
-          id: pbxUser.id,
-          username: pbxUser.username,
-          status: pbxUser.status,
-          disabled: pbxUser.disabled,
-          domainId: pbxUser.domainId || undefined,
-        },
-        tenant: {
-          ...user.tenant,
-          name: user.tenant.name,
-        },
-      },
-    };
-  } catch (error) {
-    console.error("Error verifying user:", error);
-
-    return {
-      success: false,
-      needsOnboarding: false,
-      error: {
-        message: "Failed to verify user",
-        code: 500,
-      },
-    };
-  }
+  return {
+    success: false,
+    needsOnboarding: false,
+    error: {
+      message: "Sign-in verification is not available yet.",
+      code: 501,
+    },
+  };
 }
 
 interface OnboardingInput {
@@ -297,20 +123,6 @@ export async function completeOnboarding(
       };
     }
 
-    const existingUser = await prisma.auth_user.findUnique({
-      where: { uid: input.uid },
-    });
-
-    if (!existingUser) {
-      return {
-        success: false,
-        error: {
-          message: "User not found.",
-          code: 404,
-        },
-      };
-    }
-
     const result = await prisma.$transaction(async (tx) => {
       const pbxDomain = await tx.pbx_domains.create({
         data: {
@@ -320,6 +132,9 @@ export async function completeOnboarding(
           disabled: false,
           updatedBy: "system",
           description: `PBX domain for ${input.companyName}`,
+          // TODO(VGT-27): create the Firebase tenant for this organization
+          // first and store its ID here. Delete the tenant if this write fails.
+          firebaseTenantId: input.tenantId,
         },
       });
 
@@ -347,10 +162,12 @@ export async function completeOnboarding(
           username: input.email.split("@")[0],
           email: input.email,
           status: "active",
-          disabled: false,
           updatedBy: "system",
           domainId: pbxDomain.id,
-          auth_user_id: input.uid,
+          firebaseUid: input.uid,
+          homeTenantId: input.tenantId,
+          userType: "member",
+          // TODO(VGT-27): the first user of a domain gets the admin role.
         },
       });
 

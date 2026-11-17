@@ -1,6 +1,4 @@
 import type {
-  AuthUserFull,
-  DatabaseUserInput,
   Extension,
   ExtensionCreateInput,
   ExtensionUpdateInput,
@@ -30,17 +28,12 @@ import type {
   VariableCreateInput,
   VariableUpdateInput,
   VariableDisplay,
-  Tenant,
-  TenantCreateInput,
-  TenantUpdateInput,
-  TenantDisplay,
   PbxUserCreateInput,
   PbxUserUpdateInput,
   PbxUserDisplay,
   PbxUserFull,
 } from "@/lib/db/types"
 import {
-  AUTH_USER_DEFAULTS,
   DEFAULT_EXTENSION_VALUES,
   EXTENSION_USER_DEFAULTS,
   EMAIL_TEMPLATE_DEFAULTS,
@@ -51,7 +44,6 @@ import {
   ACCESS_CONTROL_NODE_DEFAULTS,
   MODULE_DEFAULTS,
   VARIABLE_DEFAULTS,
-  TENANT_DEFAULTS,
   PBX_USER_DEFAULTS,
   PBX_USER_SETTING_DEFAULTS,
 } from '@/lib/db/types'
@@ -66,202 +58,12 @@ const API_BASE_URL = isDevelopment
   : process.env.NEXT_PUBLIC_API_URL || 'https://vgtpbx.dev'
 
 
-interface VerifyAuthUserResult {
-  exists: boolean;
-  user: {
-    uid: string;
-    email: string;
-    displayName: string | null;
-    disabled: boolean;
-    tenantId: string;
-    pbx_user?: {
-      id: bigint;
-      username: string;
-      status: string;
-      disabled: boolean;
-      domainId?: string | null;
-    };
-    tenant: {
-      id: string;
-      name: string;
-      disabled: boolean;
-    };
-  } | null;
-  error?: string;
-}
 
 
-export async function createUserWithPbx(
-  authInput: DatabaseUserInput,
-  pbxInput?: Partial<PbxUserCreateInput>
-): Promise<{
-  authUser: AuthUserFull;
-  pbxUser: PbxUserFull;
-}> {
-  try {
-    return await prisma.$transaction(async (tx) => {
-      const authUser = await tx.auth_user.create({
-        //create auth_user first
-        data: {
-          ...AUTH_USER_DEFAULTS,
-          ...authInput,
-        },
-        include: {
-          auth_tenant: true,
-        }
-      });
-
-      //creare corresponding pbx_user
-      const pbxUser = await tx.pbx_users.create({
-        data: {
-          ...PBX_USER_DEFAULTS,
-          user_uuid: crypto.randomUUID(),
-          username: authInput.email.split('@')[0],
-          email: authInput.email,
-          status: 'active',
-          disabled: false,
-          auth_user_id: authUser.uid,
-          updatedBy: 'system',
-          ...pbxInput,
-          pbx_user_settings: pbxInput?.settings ? {
-            create: pbxInput.settings.map(setting => ({
-              ...PBX_USER_SETTING_DEFAULTS,
-              ...setting
-            }))
-          } : undefined,
-        },
-        include: {
-          pbx_user_settings: true,
-          auth_user: true
-        }
-      });
-
-      return {
-        authUser,
-        pbxUser
-      };
-    });
-  } catch (error) {
-    console.error('Error creating user:', error);
-    if (error instanceof Error) {
-      if (error.message.includes('Unique constraint')) {
-        throw new Error('User with this email or username already exists');
-      }
-      throw new Error(`Failed to create user: ${error.message}`);
-    }
-    throw new Error('Failed to create user');
-  }
-}
 
 
-export async function createAuthUser(input: DatabaseUserInput): Promise<AuthUserFull> {
-  try {
-    return await prisma.auth_user.create({
-      data: {
-        ...AUTH_USER_DEFAULTS,
-        ...input,
-      },
-      include: {
-        auth_tenant: true,
-      }
-    });
-  } catch (error) {
-    throw new Error(error instanceof Error ? error.message : 'Failed to create auth user');
-  }
-}
 
 
-export async function verifyAuthUser(
-  uid: string,
-  tenantId: string
-): Promise<VerifyAuthUserResult> {
-  try {
-    const user = await prisma.auth_user.findFirst({
-      where: {
-        AND: [
-          { uid },
-          { tenantId },
-          { disabled: false },
-        ]
-      },
-      select: {
-        uid: true,
-        email: true,
-        displayName: true,
-        disabled: true,
-        tenantId: true,
-        pbx_users: {
-          select: {
-            id: true,
-            username: true,
-            disabled: true,
-            status: true,
-            domainId: true,
-          }
-        },
-        auth_tenant: {
-          select: {
-            id: true,
-            name: true,
-            disabled: true,
-          }
-        }
-      }
-    });
-
-    if (!user) {
-      return {
-        exists: false,
-        user: null,
-        error: 'User not found'
-      };
-    }
-
-    if (user.auth_tenant.disabled) {
-      return {
-        exists: false,
-        user: null,
-        error: 'Tenant is disabled'
-      };
-    }
-
-    const pbxUser = user.pbx_users && user.pbx_users.length > 0 ? user.pbx_users[0] : undefined;
-
-    const transformedUser = {
-      uid: user.uid,
-      email: user.email,
-      displayName: user.displayName,
-      disabled: user.disabled,
-      tenantId: user.tenantId,
-      pbx_user: pbxUser ? {
-        id: pbxUser.id,
-        username: pbxUser.username,
-        status: pbxUser.status,
-        disabled: pbxUser.disabled,
-        domainId: pbxUser.domainId,
-      } : undefined,
-      tenant: {
-        id: user.auth_tenant.id,
-        name: user.auth_tenant.name,
-        disabled: user.auth_tenant.disabled,
-      }
-    };
-
-    return {
-      exists: true,
-      user: transformedUser,
-      error: undefined
-    };
-
-  } catch (error) {
-    console.error('Error verifying auth user:', error);
-    return {
-      exists: false,
-      user: null,
-      error: error instanceof Error ? error.message : 'Failed to verify user'
-    };
-  }
-}
 
 
 
@@ -274,15 +76,9 @@ export async function listPbxUsers(): Promise<PbxUserDisplay[]> {
         username: true,
         email: true,
         status: true,
-        disabled: true,
-        auth_user: {
-          select: {
-            displayName: true,
-            firstName: true,
-            lastName: true,
-            avatar: true,
-          }
-        }
+        userType: true,
+        firebaseUid: true,
+        groupId: true,
       },
       orderBy: { created: 'desc' }
     });
@@ -298,7 +94,6 @@ export async function getPbxUser(id: bigint): Promise<PbxUserFull | null> {
       where: { id },
       include: {
         pbx_user_settings: true,
-        auth_user: true
       }
     });
   } catch (error) {
@@ -309,15 +104,8 @@ export async function getPbxUser(id: bigint): Promise<PbxUserFull | null> {
 
 export async function createPbxUser(input: PbxUserCreateInput): Promise<PbxUserFull> {
   try {
-
-    const authUser = await prisma.auth_user.findUnique({
-      where: { uid: input.auth_user_id }
-    });
-
-    if (!authUser) {
-      throw new Error('Auth user not found');
-    }
-
+    // TODO(VGT-30): inviting a member creates the Firebase user in the admin's
+    // tenant first, then inserts this row with status "invited".
     const { settings, ...userData } = input;
 
     return await prisma.pbx_users.create({
@@ -333,7 +121,6 @@ export async function createPbxUser(input: PbxUserCreateInput): Promise<PbxUserF
       },
       include: {
         pbx_user_settings: true,
-        auth_user: true
       }
     });
   } catch (error) {
@@ -365,7 +152,6 @@ export async function PbxupdateUser(
       },
       include: {
         pbx_user_settings: true,
-        auth_user: true
       }
     });
   } catch (error) {
@@ -386,150 +172,8 @@ export async function PbxdeleteUser(id: bigint): Promise<void> {
 
 
 
-export async function createUserOld(input: DatabaseUserInput | null) {
-  console.log("user: createUser received input:", input);
-  if (!input) {
-    console.error("user: Input is null in createUser");
-    throw new Error("User input data is required")
-  }
 
 
-  try {
-    // Create a sanitized version of the input data
-    const sanitizedData = {
-      uid: input.uid,
-      email: input.email.toLowerCase(),
-      displayName: input.displayName,
-      firstName: input.firstName,
-      lastName: input.lastName,
-      avatar: input.avatar,
-      tenantId: input.tenantId,
-      isSuperuser: input.isSuperuser,
-      isAdmin: input.isAdmin,
-      isStaff: input.isStaff,
-      phoneNumber: input.phoneNumber,
-      emailVerified: input.emailVerified,
-      disabled: input.disabled,
-      createdAt: input.createdAt,
-      lastSignInAt: input.lastSignInAt,
-      updatedAt: new Date(),
-    }
-
-    console.log("user: Cleaned user data:", sanitizedData)
-
-
-    const user = await prisma.auth_user.create({
-      data: sanitizedData,
-      select: {
-        uid: true,
-        email: true,
-        displayName: true,
-        firstName: true,
-        lastName: true,
-        avatar: true,
-        tenantId: true,
-        isSuperuser: true,
-        isAdmin: true,
-        isStaff: true,
-        phoneNumber: true,
-        disabled: true,
-        updatedAt: true,
-        createdAt: true,
-        lastSignInAt: true,
-      },
-    })
-
-    if (!user) {
-      throw new Error("Failed to create user: No user returned from database")
-    }
-
-    console.log("Prisma create operation returned:", user);
-
-    return user
-  } catch (error) {
-    console.error("Detailed error in createUser:", {
-      error,
-      errorMessage: error instanceof Error ? error.message : "Unknown error",
-      errorStack: error instanceof Error ? error.stack : undefined,
-    })
-    if (error instanceof Error) {
-      if (error.message.includes("Unique constraint")) {
-        throw new Error("User with this email or uid already exists")
-      }
-      if (error.message.includes("Foreign key constraint")) {
-        throw new Error("Invalid tenant ID")
-      }
-      throw new Error(`Failed to create user: ${error.message}`)
-    }
-    throw new Error("Failed to create user: Unknown error")
-  }
-}
-
-
-export async function verifyDatabaseUser(uid: string): Promise<{
-  success: boolean;
-  user?: {
-    uid: string;
-    email: string;
-    displayName: string | null;
-    tenantId: string;
-    isAdmin: boolean;
-    emailVerified: boolean;
-    disabled: boolean;
-  };
-  error?: {
-    code: string;
-    message: string;
-  };
-}> {
-  try {
-    const dbUser = await prisma.auth_user.findUnique({
-      where: { uid },
-      select: {
-        uid: true,
-        email: true,
-        displayName: true,
-        tenantId: true,
-        isAdmin: true,
-        disabled: true,
-      }
-    })
-
-    if (!dbUser) {
-      return {
-        success: false,
-        error: {
-          code: 'USER_NOT_FOUND',
-          message: 'User not found in database'
-        }
-      }
-    }
-
-    if (dbUser.disabled) {
-      return {
-        success: false,
-        error: {
-          code: 'USER_INACTIVE',
-          message: 'User account is inactive'
-        }
-      }
-    }
-
-    return {
-      success: true,
-      user: dbUser
-    }
-  } catch (error) {
-    console.error('Error verifying database user:', error)
-    return {
-      success: false,
-      error: {
-        code: 'VERIFICATION_ERROR',
-        message: error instanceof Error ? error.message : 'Failed to verify user'
-      }
-    }
-  }
-}
 
 
 
@@ -1184,80 +828,11 @@ export async function deleteVariable(id: string): Promise<void> {
 }
 
 
-export async function listTenants(): Promise<TenantDisplay[]> {
-  try {
-    return await prisma.auth_tenant.findMany({
-      select: {
-        id: true,
-        name: true,
-        domain: true,
-        description: true,
-        logo: true,
-        plan: true,
-        maxUsers: true,
-        disabled: true,
-      },
-      orderBy: { createdAt: 'desc' }
-    });
-  } catch (error) {
-    throw new Error(error instanceof Error ? error.message : 'Failed to fetch tenants');
-  }
-}
 
 
-export async function getTenant(id: string): Promise<Tenant | null> {
-  try {
-    return await prisma.auth_tenant.findUnique({
-      where: { id }
-    });
-  } catch (error) {
-    throw new Error(error instanceof Error ? error.message : 'Failed to fetch tenant');
-  }
-}
 
 
-export async function createTenant(input: TenantCreateInput): Promise<Tenant> {
-  try {
-    return await prisma.auth_tenant.create({
-      data: {
-        ...TENANT_DEFAULTS,
-        ...input,
-      },
-      include: {
-        users: true,
-        pbxDomains: true
-      }
-    });
-  } catch (error) {
-    throw new Error(error instanceof Error ? error.message : 'Failed to create tenant');
-  }
-}
 
 
-export async function updateTenant(
-  id: string,
-  data: TenantUpdateInput
-): Promise<Tenant> {
-  try {
-    return await prisma.auth_tenant.update({
-      where: { id },
-      data: {
-        ...data,
-        updatedAt: new Date(),
-      }
-    });
-  } catch (error) {
-    throw new Error(error instanceof Error ? error.message : 'Failed to update tenant');
-  }
-}
 
 
-export async function deleteTenant(id: string): Promise<void> {
-  try {
-    await prisma.auth_tenant.delete({
-      where: { id }
-    });
-  } catch (error) {
-    throw new Error(error instanceof Error ? error.message : 'Failed to delete tenant');
-  }
-}
