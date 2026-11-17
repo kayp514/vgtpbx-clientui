@@ -4,7 +4,6 @@ import type { ReactNode } from "react"
 import { cn } from "@/lib/utils"
 import { Sidebar } from "@/components/sidebar"
 import { Header } from "@/components/dashboard-header"
-import { usePathname } from "next/navigation"
 
 interface AppLayoutProps {
   children: ReactNode
@@ -12,7 +11,6 @@ interface AppLayoutProps {
 }
 
 export function DashboardLayout({ children, className }: AppLayoutProps) {
-  const pathname = usePathname()
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">

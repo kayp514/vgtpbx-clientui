@@ -39,3 +39,9 @@ next-env.d.ts
 
 # Turborepo
 .turbo
+
+/docs
+
+pbx-database-client-types/
+
+/vogat-eslserver

@@ -7,8 +7,6 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { departments } from "@/lib/mock-data"
 import type { AuthUsers } from "@/lib/mock-data"
 import { RefreshCw } from "lucide-react"
 
@@ -24,7 +22,6 @@ export function UserForm({ user, onSubmit, onCancel }: UserFormProps) {
     lastName: user?.lastName || "",
     displayName: user?.displayName || "",
     email: user?.email || "",
-    department: user?.department || "",
     disabled: user?.disabled || false,
     isAdmin: user?.isAdmin || false,
     isSuperuser: user?.isSuperuser || false,
@@ -160,22 +157,6 @@ export function UserForm({ user, onSubmit, onCancel }: UserFormProps) {
             className={errors.email ? "border-red-500" : ""}
           />
           {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
-        </div>
-
-        <div className="grid gap-2">
-          <Label htmlFor="department">Department</Label>
-          <Select value={formData.department} onValueChange={(value) => handleChange("department", value)}>
-            <SelectTrigger id="department">
-              <SelectValue placeholder="Select department" />
-            </SelectTrigger>
-            <SelectContent>
-              {departments.map((department) => (
-                <SelectItem key={department} value={department}>
-                  {department}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
         </div>
 
         <div className="grid gap-4">

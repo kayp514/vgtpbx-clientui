@@ -1,4 +1,4 @@
-import { navigation, type NavItem } from "@/lib/navigation"
+import { getNavigation, type NavItem } from "@/lib/navigation"
 
 import type { InboundRule } from "@/lib/mock-type"
 

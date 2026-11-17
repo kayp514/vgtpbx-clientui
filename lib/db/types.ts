@@ -1,6 +1,6 @@
 import type {
   auth_user,
-  auth_tenant, 
+  auth_tenant,
   pbx_access_controls,
   pbx_access_control_nodes,
   pbx_extensions,
@@ -17,53 +17,55 @@ import type {
   pbx_sip_profile_settings,
   pbx_users,
   pbx_user_settings,
-  Prisma
- } from '@prisma/client'
+} from '@/prisma/pbx-database-client-types/client';
 
- export interface AuthUserFull extends auth_user {}
+export interface AuthUserFull extends auth_user { }
 
 export interface PbxUserFull extends pbx_users {
   pbx_user_settings: PbxUserSettingFull[];
   auth_user: auth_user;
 }
 
-export interface PbxUserSettingFull extends pbx_user_settings {}
+export interface PbxUserSettingFull extends pbx_user_settings { }
 
 export interface AccessControl extends pbx_access_controls {
   pbx_access_control_nodes: AccessControlNode[];
 }
 
-export interface AccessControlNode extends pbx_access_control_nodes {}
+export interface AccessControlNode extends pbx_access_control_nodes { }
 
 export interface Extension extends pbx_extensions {
   pbx_extension_users: ExtensionUser[];
 }
-export interface ExtensionUser extends pbx_extension_users {}
-export interface Gateway extends pbx_gateways {}
+export interface ExtensionUser extends pbx_extension_users { }
+export interface Gateway extends pbx_gateways { }
 export interface Domain extends pbx_domains {
   domain_settings: DomainSetting[];
 }
-export interface DomainSetting extends pbx_domain_settings {}
-export interface AccessControl extends pbx_access_controls {}
-export interface EmailTemplate extends pbx_email_templates {}
-export interface Bridge extends pbx_bridges {}
+export interface DomainSetting extends pbx_domain_settings { }
+export interface AccessControl extends pbx_access_controls { }
+export interface EmailTemplate extends pbx_email_templates { }
+export interface Bridge extends pbx_bridges { }
 export interface SipProfileFull extends pbx_sip_profiles {
   pbx_sip_profile_domains: SipProfileDomainFull[];
   pbx_sip_profile_settings: SipProfileSettingFull[];
 }
-export interface SipProfileDomainFull extends pbx_sip_profile_domains {}
-export interface SipProfileSettingFull extends pbx_sip_profile_settings {}
-export interface EmailTemplate extends pbx_email_templates {}
-export interface Module extends pbx_modules {}
-export interface Variable extends pbx_vars {}
-export interface Tenant extends auth_tenant {}
+export interface SipProfileDomainFull extends pbx_sip_profile_domains { }
+export interface SipProfileSettingFull extends pbx_sip_profile_settings { }
+export interface EmailTemplate extends pbx_email_templates { }
+export interface Module extends pbx_modules { }
+export interface Variable extends pbx_vars { }
+export interface Tenant extends auth_tenant { }
 
 
 
 export type UserRole = "admin" | "superuser" | "member"
 
+/**
+ *  emailVerified has been removed
+ */
 export const AUTH_USER_DEFAULTS = {
-  emailVerified: false,
+  //emailVerified: false,
   isStaff: false,
   updatedAt: new Date(),
 } as const;
@@ -78,7 +80,6 @@ export const PBX_USER_DEFAULTS = {
 } as const;
 
 export const PBX_USER_SETTING_DEFAULTS = {
-  id: crypto.randomUUID(),
   created: new Date(),
   updated: new Date(),
   updated_by: 'system',
@@ -88,13 +89,10 @@ export const PBX_USER_SETTING_DEFAULTS = {
 export const TENANT_DEFAULTS = {
   createdAt: new Date(),
   updatedAt: new Date(),
-  plan: 'basic',
-  maxUsers: 5,
   disabled: false,
 } as const;
 
 export const VARIABLE_DEFAULTS = {
-  id: crypto.randomUUID(),
   created: new Date(),
   updated: new Date(),
   updated_by: 'system',
@@ -102,7 +100,6 @@ export const VARIABLE_DEFAULTS = {
 } as const;
 
 export const MODULE_DEFAULTS = {
-  id: crypto.randomUUID(),
   created: new Date(),
   updated: new Date(),
   updated_by: 'system',
@@ -118,7 +115,6 @@ export const EMAIL_TEMPLATE_DEFAULTS = {
 } as const;
 
 export const ACCESS_CONTROL_DEFAULTS = {
-  id: crypto.randomUUID(),
   created: new Date(),
   updated: new Date(),
   updated_by: 'system',
@@ -126,7 +122,6 @@ export const ACCESS_CONTROL_DEFAULTS = {
 
 
 export const ACCESS_CONTROL_NODE_DEFAULTS = {
-  id: crypto.randomUUID(),
   created: new Date(),
   updated: new Date(),
   updated_by: 'system',
@@ -178,26 +173,21 @@ export const BRIDGE_DEFAULTS = {
 } as const;
 
 export const SIP_PROFILE_DEFAULTS = {
-  id: crypto.randomUUID(),
   created: new Date(),
   updated: new Date(),
   updated_by: 'system',
-  disabled: false
 } as const;
 
 export const SIP_PROFILE_DOMAIN_DEFAULTS = {
-  id: crypto.randomUUID(),
   created: new Date(),
   updated: new Date(),
   updated_by: 'system',
 } as const;
 
 export const SIP_PROFILE_SETTING_DEFAULTS = {
-  id: crypto.randomUUID(),
   created: new Date(),
   updated: new Date(),
   updated_by: 'system',
-  disabled: false
 } as const;
 
 export const DOMAIN_DEFAULTS = {
@@ -209,7 +199,6 @@ export const DOMAIN_DEFAULTS = {
 } as const;
 
 export const DOMAIN_SETTING_DEFAULTS = {
-  id: crypto.randomUUID(),
   created: new Date(),
   updated: new Date(),
   updated_by: 'system',
@@ -218,21 +207,21 @@ export const DOMAIN_SETTING_DEFAULTS = {
 
 
 export interface FirebaseAuthUser {
-    uid: string
-    email: string
-    displayName?: string | null
-    photoURL?: string | null
-    tenantId: string
-    emailVerified: boolean
-    disabled: boolean
-    phoneNumber: string | null
-    metadata: {
-        creationTime: string | undefined
-        lastSignInTime: string | undefined
-      }
+  uid: string
+  email: string
+  displayName?: string | null
+  photoURL?: string | null
+  tenantId: string
+  emailVerified: boolean
+  disabled: boolean
+  phoneNumber: string | null
+  metadata: {
+    creationTime: string | undefined
+    lastSignInTime: string | undefined
+  }
 }
 
-  
+
 export interface DatabaseUserInput {
   uid: string
   email: string
@@ -316,7 +305,7 @@ export interface PbxUserFilters {
 }
 
 // Sort type
-export type PbxUserSortField = 
+export type PbxUserSortField =
   | 'username'
   | 'email'
   | 'status'
@@ -327,19 +316,19 @@ export interface PbxUserSortOptions {
   field: PbxUserSortField;
   direction: 'asc' | 'desc';
 }
-  
+
 export interface SignUpResultOld {
-    success: boolean
-    user?: {
-      uid: string
-      email: string
-      tenantId: string
-      emailVerified: boolean
-    }
-    error?: {
-      code: string
-      message: string
-    }
+  success: boolean
+  user?: {
+    uid: string
+    email: string
+    tenantId: string
+    emailVerified: boolean
+  }
+  error?: {
+    code: string
+    message: string
+  }
 }
 
 export interface SignUpResult {
@@ -356,13 +345,14 @@ export interface SignUpResult {
 
 export interface VerifyResult {
   success: boolean;
+  needsOnboarding?: boolean;
+  slug?: string;
   data?: {
     auth: {
       uid: string;
       email: string;
       displayName: string | null;
       disabled: boolean;
-      emailVerified: boolean;
       tenantId: string;
     };
     pbx?: {
@@ -370,12 +360,12 @@ export interface VerifyResult {
       username: string;
       status: string;
       disabled: boolean;
+      domainId?: string;
     };
     tenant: {
       id: string;
+      name?: string;
       disabled: boolean;
-      plan: string;
-      maxUsers: number;
     };
   };
   error?: {
@@ -385,11 +375,11 @@ export interface VerifyResult {
 }
 
 
-  export interface User {
-    uid: string
-    name: string
-    email: string
-    avatar?: string
+export interface User {
+  uid: string
+  name: string
+  email: string
+  avatar?: string
 }
 
 
@@ -475,7 +465,7 @@ export interface ModuleOld {
   category: string;
   enabled: string;
   description: string;
-  status?: 'running' | 'stopped'; 
+  status?: 'running' | 'stopped';
 }
 
 
@@ -524,19 +514,19 @@ export interface ExtensionCreateInput {
 }
 
 export type ExtensionDisplay = Pick<Extension,
-| 'id'
-| 'extension'
-| 'effective_caller_id_name'
-| 'effective_caller_id_number' 
-| 'call_group'
-| 'user_context'
-| 'disabled'
+  | 'id'
+  | 'extension'
+  | 'effective_caller_id_name'
+  | 'effective_caller_id_number'
+  | 'call_group'
+  | 'user_context'
+  | 'disabled'
 >;
 
 export type ExtensionUpdateInput = Partial<Omit<Extension, 'id' | 'created' | 'pbx_extension_users'>> & {
   updated?: Date;
   updated_by?: string;
-  users?: ExtensionUserCreateInput[]; 
+  users?: ExtensionUserCreateInput[];
 };
 
 export interface ExtensionUserCreateInput {
@@ -706,7 +696,6 @@ export interface DomainCreateInput {
 export type DomainDisplay = Pick<Domain,
   | 'id'
   | 'name'
-  | 'tenantId'
   | 'portalName'
   | 'homeSwitch'
   | 'description'
@@ -801,6 +790,7 @@ export interface AuthUsers {
   email: string;
   firstName: string;
   lastName: string;
+  phoneNumber: string | null;
   disabled: boolean;
   isAdmin: boolean;
   isStaff: boolean;
@@ -809,19 +799,19 @@ export interface AuthUsers {
 
 
 export interface tenant {
-  id: string;    
+  id: string;
   createdAt: Date;
   updatedAt: Date;
   name: string;
-  domain?: string        
-  description?: string;        
-  plan: string;       
-  maxUsers: number;        
-  disabled: Boolean       
+  domain?: string
+  description?: string;
+  plan: string;
+  maxUsers: number;
+  disabled: boolean
 }
 
 export interface TenantCreateInput {
-  id: string; 
+  id: string;
   name: string;
   domain: string;
   description?: string;
@@ -833,11 +823,7 @@ export interface TenantCreateInput {
 export type TenantDisplay = Pick<Tenant,
   | 'id'
   | 'name'
-  | 'domain'
   | 'description'
-  | 'logo'
-  | 'plan'
-  | 'maxUsers'
   | 'disabled'
 >;
 
@@ -852,4 +838,50 @@ export interface TenantOption {
 }
 
 
-  
+// v2
+
+
+export interface CreateAuthUserInput {
+  uid: string;
+  email: string;
+  displayName?: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
+  avatar?: string | null;
+  phoneNumber?: string | null;
+  tenantId?: string;
+  isSuperuser?: boolean;
+  isAdmin?: boolean;
+  isStaff?: boolean;
+  disabled?: boolean;
+  lastSignInAt: Date | null;
+  createdAt: Date | null;
+}
+
+export type AuthUserWithTenant = auth_user & {
+  auth_tenant: auth_tenant;
+};
+
+
+export interface DomainUser {
+  id: bigint;
+  user_uuid: string;
+  username: string;
+  email: string | null;
+  status: string;
+  disabled: boolean;
+  created: Date | null;
+  auth: {
+    uid: string;
+    displayName: string | null;
+    firstName: string | null;
+    lastName: string | null;
+    email: string;
+    avatar: string | null;
+    phoneNumber: string | null;
+    isAdmin: boolean;
+    isStaff: boolean;
+    isSuperuser: boolean;
+    disabled: boolean;
+  } | null;
+}

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
-import { TernSecureProvider } from "@tern-secure/nextjs"
+import { TernSecureProvider } from "@tern-secure/nextjs";
 import "./globals.css";
 
 const geistSans = localFont({
@@ -16,7 +16,8 @@ const geistMono = localFont({
 
 export const metadata: Metadata = {
   title: "VogatPBX - Advanced Multi-Domain PBX System",
-  description: "VogatPBX is a powerful and flexible multi-domain PBX system for modern businesses.",
+  description:
+    "VogatPBX is a powerful and flexible multi-domain PBX system for modern businesses.",
 };
 
 export default function RootLayout({
@@ -25,13 +26,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <TernSecureProvider
+          appName="VogatPBX"
+          ternUIUrl="https://cdn.jsdelivr.net/npm/@tern-secure/auth@1.1.0-canary.v20260103004539/dist/ternsecure.browser.js"
+          persistence="browserCookie"
+          apiUrl='localhost:3000'
+          requiresVerification={false}
+        >
+          {children}
+        </TernSecureProvider>
       </body>
     </html>
   );
 }
-
