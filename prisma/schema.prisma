@@ -104,8 +104,7 @@ model invite {
   createdBy String    @db.VarChar(50) // uid of inviter
   createdAt DateTime  @default(now())
 
-  pbx_domain pbx_domains @relation(fields: [domainId], references: [id], onDelete: Cascade)
-  auth_group auth_group  @relation(fields: [groupId], references: [id])
+  auth_group auth_group @relation(fields: [groupId], references: [id])
 
   @@index([email])
   @@index([token])
@@ -1265,10 +1264,10 @@ model pbx_domains {
   ipAddress    String?   @db.VarChar(45)
   menuId       String?   @db.Uuid
   portalName   String?   @unique @db.VarChar(128)
+  firebaseTenantId String @unique @db.VarChar(128)
 
   // Relations
   subscription           subscription?
-  invites                invite[]
   pbx_auto_report        pbx_auto_report[]
   pbx_bridges            pbx_bridges[]
   pbx_call_block         pbx_call_block[]
