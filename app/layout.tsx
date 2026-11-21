@@ -34,7 +34,7 @@ export default function RootLayout({
           appName="VogatPBX"
           ternUIUrl="https://cdn.jsdelivr.net/npm/@tern-secure/auth@1.1.0-canary.v20260103004539/dist/ternsecure.browser.js"
           persistence="browserCookie"
-          apiUrl='localhost:3000'
+          apiUrl='id.localhost:3000'
           requiresVerification={false}
         >
           {children}
