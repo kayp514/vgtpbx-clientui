@@ -10,7 +10,7 @@
 /coverage
 
 # next.js
-/.next/
+.next/
 /out/
 
 # production
@@ -42,7 +42,9 @@ next-env.d.ts
 
 /docs
 
+# generated Prisma client
 pbx-database-client-types/
+packages/db/generated/
 
 /vogat-eslserver
 
