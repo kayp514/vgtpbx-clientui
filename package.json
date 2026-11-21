@@ -63,9 +63,15 @@
     "prisma": "6.19.0",
     "tailwindcss": "^4",
     "tsx": "^4.19.3",
+    "turbo": "^2.11.13",
     "typescript": "^5"
   },
-  "packageManager": "npm@11.3.0",
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "10.10.0"
+    }
+  },
   "engines": {
     "node": "^20"
   },
