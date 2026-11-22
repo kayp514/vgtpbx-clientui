@@ -118,6 +118,9 @@ importers:
       '@tanstack/react-table':
         specifier: ^8.21.3
         version: 8.21.3(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      '@tern-secure/backend':
+        specifier: 1.2.0-canary.v20260623135837
+        version: 1.2.0-canary.v20260623135837(@upstash/redis@1.41.0)(firebase-admin@12.7.0)(firebase-functions@6.6.0(firebase-admin@12.7.0))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       '@tern-secure/nextjs':
         specifier: ^5.2.0-canary.v20260103004539
         version: 5.2.0-canary.v20260623135837(@upstash/redis@1.41.0)(firebase-admin@12.7.0)(firebase-functions@6.6.0(firebase-admin@12.7.0))(firebase@12.19.0)(next@16.1.1(@babel/core@7.29.13)(@opentelemetry/api@1.10.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
