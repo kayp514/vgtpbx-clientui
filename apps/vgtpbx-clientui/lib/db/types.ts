@@ -15,7 +15,7 @@ import type {
   pbx_sip_profile_settings,
   pbx_users,
   pbx_user_settings,
-} from '@/prisma/pbx-database-client-types/client';
+} from '@vgtpbx/db/types';
 
 export interface PbxUserFull extends pbx_users {
   pbx_user_settings: PbxUserSettingFull[];

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { create } from 'xmlbuilder2'
-import prisma from '@/lib/prisma'
+import prisma from '@vgtpbx/db'
 import { getDirectoryExtension } from '@/lib/db/q'
 import { getDialplanByContext, getSystemVariables } from '@/lib/db/dialplan'
 import { logToFreeswitchConsole } from '@/lib/switchLogger'

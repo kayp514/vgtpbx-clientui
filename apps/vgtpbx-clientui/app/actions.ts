@@ -1,6 +1,6 @@
 "use server";
 
-import prisma from "@/lib/prisma";
+import prisma from "@vgtpbx/db";
 import { revalidatePath } from "next/cache";
 import type {
   DomainUser,

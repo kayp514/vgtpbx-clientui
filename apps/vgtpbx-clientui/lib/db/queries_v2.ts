@@ -1,4 +1,4 @@
-import prisma from '@/lib/prisma';
+import prisma from '@vgtpbx/db';
 import type { DomainUser } from '@/lib/db/types';
 
 // TODO(VGT-30): inviting a member replaces the old auth-table and

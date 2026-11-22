@@ -1,14 +1,14 @@
-import { PrismaClient } from '../prisma/pbx-database-client-types/client'
-import { DOMAIN_DEFAULTS } from '../lib/db/types'
+import { PrismaClient } from '../generated/client'
+import { DOMAIN_DEFAULTS } from '../../../apps/vgtpbx-clientui/lib/db/types'
 import {
   defaultAccessControlNodes,
   defaultAccessControls,
   defaultSipProfilesFull
-} from '@/lib/db/switch-data'
-import dialplanDefaultsData from '@/lib/resources/pbx_dialplan_defaults.json'
-import varsDefaultsData from '@/lib/resources/pbx_vars.json'
-import modulesDefaultsData from '@/lib/resources/pbx_modules.json'
-import defaultSettingsData from '@/lib/resources/pbx_default_settings.json'
+} from '../../../apps/vgtpbx-clientui/lib/db/switch-data'
+import dialplanDefaultsData from '../../../apps/vgtpbx-clientui/lib/resources/pbx_dialplan_defaults.json'
+import varsDefaultsData from '../../../apps/vgtpbx-clientui/lib/resources/pbx_vars.json'
+import modulesDefaultsData from '../../../apps/vgtpbx-clientui/lib/resources/pbx_modules.json'
+import defaultSettingsData from '../../../apps/vgtpbx-clientui/lib/resources/pbx_default_settings.json'
 
 const prisma = new PrismaClient()
 

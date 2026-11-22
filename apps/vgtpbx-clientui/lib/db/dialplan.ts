@@ -1,6 +1,6 @@
 import { create } from 'xmlbuilder2'
-import prisma from '@/lib/prisma'
-import type { Prisma } from '@/prisma/pbx-database-client-types/client'
+import prisma from '@vgtpbx/db'
+import type { Prisma } from '@vgtpbx/db/types'
 import {
   Dialplans,
   DialplanDetails,

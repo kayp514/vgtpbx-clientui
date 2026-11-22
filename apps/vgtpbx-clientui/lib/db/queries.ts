@@ -48,7 +48,7 @@ import {
   PBX_USER_SETTING_DEFAULTS,
 } from '@/lib/db/types'
 
-import prisma from '@/lib/prisma';
+import prisma from '@vgtpbx/db';
 
 
 const isDevelopment = process.env.NODE_ENV === 'development'

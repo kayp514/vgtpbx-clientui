@@ -21,12 +21,6 @@ importers:
       '@hookform/resolvers':
         specifier: ^5.0.1
         version: 5.9.2(@standard-schema/spec@1.1.0)(effect@3.18.4)(react-hook-form@7.92.0(@types/react@19.2.7)(react@19.2.3))(zod@3.25.76)
-      '@prisma/adapter-pg':
-        specifier: ^7.2.0
-        version: 7.10.1
-      '@prisma/client':
-        specifier: 6.19.0
-        version: 6.19.0(prisma@6.19.0(typescript@5.9.3))(typescript@5.9.3)
       '@radix-ui/react-alert-dialog':
         specifier: ^1.1.7
         version: 1.2.1(@types/react-dom@19.2.3(@types/react@19.2.7))(@types/react@19.2.7)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
@@ -84,6 +78,9 @@ importers:
       '@tern-secure/nextjs':
         specifier: ^5.2.0-canary.v20260103004539
         version: 5.2.0-canary.v20260623135837(@upstash/redis@1.41.0)(firebase-admin@12.7.0)(firebase-functions@6.6.0(firebase-admin@12.7.0))(firebase@12.19.0)(next@16.1.1(@babel/core@7.29.13)(@opentelemetry/api@1.10.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      '@vgtpbx/db':
+        specifier: workspace:*
+        version: link:../../packages/db
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -105,9 +102,6 @@ importers:
       next-themes:
         specifier: ^0.4.6
         version: 0.4.6(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
-      pg:
-        specifier: ^8.16.3
-        version: 8.23.1
       react:
         specifier: 19.2.3
         version: 19.2.3
@@ -148,9 +142,6 @@ importers:
       '@types/react-dom':
         specifier: 19.2.3
         version: 19.2.3(@types/react@19.2.7)
-      dotenv:
-        specifier: ^16.6.1
-        version: 16.6.1
       dotenv-cli:
         specifier: ^8.0.0
         version: 8.0.0
@@ -160,12 +151,37 @@ importers:
       eslint-config-next:
         specifier: 16.1.1
         version: 16.1.1(@typescript-eslint/parser@8.73.0(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.3))(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.3)
-      prisma:
-        specifier: 6.19.0
-        version: 6.19.0(typescript@5.9.3)
       tailwindcss:
         specifier: ^4
         version: 4.3.5
+      typescript:
+        specifier: ^5
+        version: 5.9.3
+
+  packages/db:
+    dependencies:
+      '@prisma/adapter-pg':
+        specifier: ^7.2.0
+        version: 7.10.1
+      '@prisma/client':
+        specifier: 6.19.0
+        version: 6.19.0(prisma@6.19.0(typescript@5.9.3))(typescript@5.9.3)
+      pg:
+        specifier: ^8.16.3
+        version: 8.23.1
+      server-only:
+        specifier: ^0.0.1
+        version: 0.0.1
+    devDependencies:
+      '@types/node':
+        specifier: ^20
+        version: 20.19.43
+      dotenv:
+        specifier: ^16.6.1
+        version: 16.6.1
+      prisma:
+        specifier: 6.19.0
+        version: 6.19.0(typescript@5.9.3)
       tsx:
         specifier: ^4.19.3
         version: 4.23.15

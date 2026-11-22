@@ -1,6 +1,6 @@
 generator client {
   provider = "prisma-client-js"
-   output = "../prisma/pbx-database-client-types"
+   output = "../generated/client"
 }
 
 datasource db {
