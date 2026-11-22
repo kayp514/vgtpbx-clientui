@@ -20,7 +20,7 @@ model auth_group {
 }
 
 model subscription {
-  id        String     @id @default(dbgenerated("'sub_' || gen_random_uuid()")) @db.VarChar(50)
+  id        String     @id @default(dbgenerated("('sub_'::text || gen_random_uuid())")) @db.VarChar(50)
   domainId  String     @unique @db.Uuid
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
