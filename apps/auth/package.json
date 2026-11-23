@@ -15,7 +15,7 @@
   },
   "devDependencies": {
     "@tailwindcss/turbopack": "4.3.3",
-    "@tern-secure/nextjs": "^5.2.0-canary.v20260103004539",
+    "@tern-secure/nextjs": "^5.2.0-canary.v20261123050207",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

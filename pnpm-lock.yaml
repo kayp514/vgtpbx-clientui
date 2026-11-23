@@ -20,7 +20,7 @@ importers:
     dependencies:
       next:
         specifier: 16.4.6
-        version: 16.4.6(@opentelemetry/api@1.10.0)(@types/node@20.19.43)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+        version: 16.4.6(@babel/core@7.29.13)(@opentelemetry/api@1.10.0)(@types/node@20.19.43)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       react:
         specifier: 19.3.0
         version: 19.3.0
@@ -32,8 +32,8 @@ importers:
         specifier: 4.3.3
         version: 4.3.3
       '@tern-secure/nextjs':
-        specifier: ^5.2.0-canary.v20260103004539
-        version: 5.2.0-canary.v20260623135837(@upstash/redis@1.41.0)(firebase-admin@12.7.0)(firebase-functions@6.6.0(firebase-admin@12.7.0))(firebase@12.19.0)(next@16.4.6(@opentelemetry/api@1.10.0)(@types/node@20.19.43)(react-dom@19.3.0(react@19.3.0))(react@19.3.0))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+        specifier: ^5.2.0-canary.v20261123050207
+        version: 5.2.0-canary.v20261123050207(@upstash/redis@1.41.0)(firebase-admin@12.7.0)(firebase-functions@6.6.0(firebase-admin@12.7.0))(firebase@12.19.0)(next@16.4.6(@babel/core@7.29.13)(@opentelemetry/api@1.10.0)(@types/node@20.19.43)(react-dom@19.3.0(react@19.3.0))(react@19.3.0))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       '@types/node':
         specifier: ^20
         version: 20.19.43
@@ -48,7 +48,7 @@ importers:
         version: 9.39.5(jiti@2.7.0)
       eslint-config-next:
         specifier: 16.4.6
-        version: 16.4.6(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.3)
+        version: 16.4.6(@typescript-eslint/parser@8.73.0(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.3))(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.3)
       tailwindcss:
         specifier: 4.3.3
         version: 4.3.3
@@ -114,7 +114,7 @@ importers:
         version: 1.4.1(@types/react-dom@19.2.3(@types/react@19.2.7))(@types/react@19.2.7)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       '@sentry/nextjs':
         specifier: ^11.16.0
-        version: 11.16.0(next@16.1.1(@babel/core@7.29.13)(@opentelemetry/api@1.10.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react@19.2.3)
+        version: 11.16.0(next@16.1.1(@opentelemetry/api@1.10.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react@19.2.3)
       '@tanstack/react-table':
         specifier: ^8.21.3
         version: 8.21.3(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
@@ -123,7 +123,7 @@ importers:
         version: 1.2.0-canary.v20260623135837(@upstash/redis@1.41.0)(firebase-admin@12.7.0)(firebase-functions@6.6.0(firebase-admin@12.7.0))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       '@tern-secure/nextjs':
         specifier: ^5.2.0-canary.v20260103004539
-        version: 5.2.0-canary.v20260623135837(@upstash/redis@1.41.0)(firebase-admin@12.7.0)(firebase-functions@6.6.0(firebase-admin@12.7.0))(firebase@12.19.0)(next@16.1.1(@babel/core@7.29.13)(@opentelemetry/api@1.10.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+        version: 5.2.0-canary.v20260623135837(@upstash/redis@1.41.0)(firebase-admin@12.7.0)(firebase-functions@6.6.0(firebase-admin@12.7.0))(firebase@12.19.0)(next@16.1.1(@opentelemetry/api@1.10.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       '@vgtpbx/db':
         specifier: workspace:*
         version: link:../../packages/db
@@ -144,7 +144,7 @@ importers:
         version: 0.487.0(react@19.2.3)
       next:
         specifier: 16.1.1
-        version: 16.1.1(@babel/core@7.29.13)(@opentelemetry/api@1.10.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+        version: 16.1.1(@opentelemetry/api@1.10.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       next-themes:
         specifier: ^0.4.6
         version: 0.4.6(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
@@ -196,7 +196,7 @@ importers:
         version: 9.39.5(jiti@2.7.0)
       eslint-config-next:
         specifier: 16.1.1
-        version: 16.1.1(@typescript-eslint/parser@8.73.0(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.3))(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.3)
+        version: 16.1.1(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.3)
       tailwindcss:
         specifier: ^4
         version: 4.3.3
@@ -2472,6 +2472,14 @@ packages:
       firebase-admin: ^12.7.0
       firebase-functions: ^6.1.2
 
+  '@tern-secure/backend@1.2.0-canary.v20261123050207':
+    resolution: {integrity: sha512-jSj6R/BN8Vrmui1RRFBycYvA7fSi8KyLeJUZxJmM++XUlxFtKemjnLXn4NSg94swupJKcUFRUo6DfqUmDn8QoQ==}
+    engines: {node: '>=20'}
+    peerDependencies:
+      '@upstash/redis': ^1.35.2
+      firebase-admin: ^12.7.0
+      firebase-functions: ^6.1.2
+
   '@tern-secure/nextjs@5.2.0-canary.v20260623135837':
     resolution: {integrity: sha512-bvZrcivxJjKhDeueWDgxZFUbEfR0bWFYdPg99QngU2GjYciHuCp1gIDDkkkB4bEtkJXC/kVRUFLrnCrXtpZQag==}
     engines: {node: '>=20'}
@@ -2481,8 +2489,24 @@ packages:
       react: ^19.0.0 || ~19.0.3 || ~19.1.4  || ~19.2.3 || ~19.3.0-0
       react-dom: ^19.0.0 || ~19.0.3 || ~19.1.4 || ~19.2.3  || ~19.3.0-0
 
+  '@tern-secure/nextjs@5.2.0-canary.v20261123050207':
+    resolution: {integrity: sha512-A0i4CCj/fVOyt68EPzARZ2h8qYCwSh1xWL0btGuxn/SqMLw2atDP7kiH2QPxoADEY5ipK6r78zxs6CwcNeOtig==}
+    engines: {node: '>=20'}
+    peerDependencies:
+      firebase: ^12.15.0
+      next: ^15.2.8 || ^15.3.8 || ^15.4.10 || ^15.5.9 || ^15.6.0-0 || ^16.0.10 || ^16.1.0-0
+      react: ^19.0.0 || ~19.0.3 || ~19.1.4  || ~19.2.3 || ~19.3.0-0
+      react-dom: ^19.0.0 || ~19.0.3 || ~19.1.4 || ~19.2.3  || ~19.3.0-0
+
   '@tern-secure/react@1.2.0-canary.v20260623135837':
     resolution: {integrity: sha512-S+lPJstmfzx+n7T62I+d8EgAcO17TMFoDo3IkWpgjP0Irc+A/u/qB2kp/hxRCcOypmIKvzWDM1pAu68D2PSO+A==}
+    peerDependencies:
+      firebase: ^12.15.0
+      react: ^19.0.0 || ~19.0.3 || ~19.1.4  || ~19.2.3 || ~19.3.0-0
+      react-dom: ^19.0.0 || ~19.0.3 || ~19.1.4 || ~19.2.3  || ~19.3.0-0
+
+  '@tern-secure/react@1.2.0-canary.v20261123050207':
+    resolution: {integrity: sha512-GO1e+G/2lNjJpawF/gkysPSfrOTCJ15psKYp3owqHytnrWzqYFMnPRWyfigF0D47+BwNvtKtdStieNpQxsFynA==}
     peerDependencies:
       firebase: ^12.15.0
       react: ^19.0.0 || ~19.0.3 || ~19.1.4  || ~19.2.3 || ~19.3.0-0
@@ -2500,8 +2524,24 @@ packages:
       react-dom:
         optional: true
 
+  '@tern-secure/shared@1.3.0-canary.v20261123050207':
+    resolution: {integrity: sha512-nfUjT4kHyvM6Ij9qFM1QBLvZp7nzyj5IhORUa9ozuoYL7/LY/OU5l7rHxApNaTT56QG4Jyh0PYQoxb8uOUXy2g==}
+    engines: {node: '>=20'}
+    peerDependencies:
+      react: ^19.0.0 || ~19.0.3 || ~19.1.4  || ~19.2.3 || ~19.3.0-0
+      react-dom: ^19.0.0 || ~19.0.3 || ~19.1.4 || ~19.2.3  || ~19.3.0-0
+    peerDependenciesMeta:
+      react:
+        optional: true
+      react-dom:
+        optional: true
+
   '@tern-secure/types@1.1.0-canary.v20260623135837':
     resolution: {integrity: sha512-4qxh1WP/COtnc/yEEuDsDOcp3VeEzijAEGShPXQie/1U2hXBM5EC+dFI6sPw/xD65jZdhSjqCZmfW+GEy4qv6w==}
+    engines: {node: '>=20'}
+
+  '@tern-secure/types@1.1.0-canary.v20261123050207':
+    resolution: {integrity: sha512-Hi2E9g/baqQ0OnqflzVC/CDb5q36hLwIFcAIiFTXe29adGncsI+6EuCHqOx9OQXlw70dw2Jf3IRvfLd5TRkj6g==}
     engines: {node: '>=20'}
 
   '@tootallnate/once@2.0.1':
@@ -6938,7 +6978,7 @@ snapshots:
     dependencies:
       '@sentry/core': 11.16.0
 
-  '@sentry/nextjs@11.16.0(next@16.1.1(@babel/core@7.29.13)(@opentelemetry/api@1.10.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react@19.2.3)':
+  '@sentry/nextjs@11.16.0(next@16.1.1(@opentelemetry/api@1.10.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react@19.2.3)':
     dependencies:
       '@opentelemetry/api': 1.10.0
       '@rollup/plugin-commonjs': 28.0.1(rollup@4.68.8)
@@ -6953,7 +6993,7 @@ snapshots:
       '@sentry/server-runtime-injection': 11.16.0
       '@sentry/server-utils': 11.16.0
       '@sentry/vercel-edge': 11.16.0
-      next: 16.1.1(@babel/core@7.29.13)(@opentelemetry/api@1.10.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      next: 16.1.1(@opentelemetry/api@1.10.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       rollup: 4.68.8
       stacktrace-parser: 0.1.11
     transitivePeerDependencies:
@@ -7188,10 +7228,10 @@ snapshots:
       - react
       - react-dom
 
-  '@tern-secure/backend@1.2.0-canary.v20260623135837(@upstash/redis@1.41.0)(firebase-admin@12.7.0)(firebase-functions@6.6.0(firebase-admin@12.7.0))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)':
+  '@tern-secure/backend@1.2.0-canary.v20261123050207(@upstash/redis@1.41.0)(firebase-admin@12.7.0)(firebase-functions@6.6.0(firebase-admin@12.7.0))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)':
     dependencies:
-      '@tern-secure/shared': 1.3.0-canary.v20260623135837(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
-      '@tern-secure/types': 1.1.0-canary.v20260623135837
+      '@tern-secure/shared': 1.3.0-canary.v20261123050207(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      '@tern-secure/types': 1.1.0-canary.v20261123050207
       '@upstash/redis': 1.41.0
       cookie: 1.0.2
       firebase-admin: 12.7.0
@@ -7202,7 +7242,7 @@ snapshots:
       - react
       - react-dom
 
-  '@tern-secure/nextjs@5.2.0-canary.v20260623135837(@upstash/redis@1.41.0)(firebase-admin@12.7.0)(firebase-functions@6.6.0(firebase-admin@12.7.0))(firebase@12.19.0)(next@16.1.1(@babel/core@7.29.13)(@opentelemetry/api@1.10.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)':
+  '@tern-secure/nextjs@5.2.0-canary.v20260623135837(@upstash/redis@1.41.0)(firebase-admin@12.7.0)(firebase-functions@6.6.0(firebase-admin@12.7.0))(firebase@12.19.0)(next@16.1.1(@opentelemetry/api@1.10.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)':
     dependencies:
       '@tern-secure/backend': 1.2.0-canary.v20260623135837(@upstash/redis@1.41.0)(firebase-admin@12.7.0)(firebase-functions@6.6.0(firebase-admin@12.7.0))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       '@tern-secure/react': 1.2.0-canary.v20260623135837(firebase@12.19.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
@@ -7210,7 +7250,7 @@ snapshots:
       '@tern-secure/types': 1.1.0-canary.v20260623135837
       firebase: 12.19.0
       jose: 5.10.0
-      next: 16.1.1(@babel/core@7.29.13)(@opentelemetry/api@1.10.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      next: 16.1.1(@opentelemetry/api@1.10.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       react: 19.2.3
       react-dom: 19.2.3(react@19.2.3)
       server-only: 0.0.1
@@ -7220,15 +7260,15 @@ snapshots:
       - firebase-admin
       - firebase-functions
 
-  '@tern-secure/nextjs@5.2.0-canary.v20260623135837(@upstash/redis@1.41.0)(firebase-admin@12.7.0)(firebase-functions@6.6.0(firebase-admin@12.7.0))(firebase@12.19.0)(next@16.4.6(@opentelemetry/api@1.10.0)(@types/node@20.19.43)(react-dom@19.3.0(react@19.3.0))(react@19.3.0))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)':
+  '@tern-secure/nextjs@5.2.0-canary.v20261123050207(@upstash/redis@1.41.0)(firebase-admin@12.7.0)(firebase-functions@6.6.0(firebase-admin@12.7.0))(firebase@12.19.0)(next@16.4.6(@babel/core@7.29.13)(@opentelemetry/api@1.10.0)(@types/node@20.19.43)(react-dom@19.3.0(react@19.3.0))(react@19.3.0))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)':
     dependencies:
-      '@tern-secure/backend': 1.2.0-canary.v20260623135837(@upstash/redis@1.41.0)(firebase-admin@12.7.0)(firebase-functions@6.6.0(firebase-admin@12.7.0))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
-      '@tern-secure/react': 1.2.0-canary.v20260623135837(firebase@12.19.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
-      '@tern-secure/shared': 1.3.0-canary.v20260623135837(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
-      '@tern-secure/types': 1.1.0-canary.v20260623135837
+      '@tern-secure/backend': 1.2.0-canary.v20261123050207(@upstash/redis@1.41.0)(firebase-admin@12.7.0)(firebase-functions@6.6.0(firebase-admin@12.7.0))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      '@tern-secure/react': 1.2.0-canary.v20261123050207(firebase@12.19.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      '@tern-secure/shared': 1.3.0-canary.v20261123050207(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      '@tern-secure/types': 1.1.0-canary.v20261123050207
       firebase: 12.19.0
       jose: 5.10.0
-      next: 16.4.6(@opentelemetry/api@1.10.0)(@types/node@20.19.43)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      next: 16.4.6(@babel/core@7.29.13)(@opentelemetry/api@1.10.0)(@types/node@20.19.43)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       react: 19.3.0
       react-dom: 19.3.0(react@19.3.0)
       server-only: 0.0.1
@@ -7247,10 +7287,10 @@ snapshots:
       react-dom: 19.2.3(react@19.2.3)
       tslib: 2.8.1
 
-  '@tern-secure/react@1.2.0-canary.v20260623135837(firebase@12.19.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)':
+  '@tern-secure/react@1.2.0-canary.v20261123050207(firebase@12.19.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)':
     dependencies:
-      '@tern-secure/shared': 1.3.0-canary.v20260623135837(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
-      '@tern-secure/types': 1.1.0-canary.v20260623135837
+      '@tern-secure/shared': 1.3.0-canary.v20261123050207(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      '@tern-secure/types': 1.1.0-canary.v20261123050207
       firebase: 12.19.0
       react: 19.3.0
       react-dom: 19.3.0(react@19.3.0)
@@ -7267,9 +7307,9 @@ snapshots:
       react: 19.2.3
       react-dom: 19.2.3(react@19.2.3)
 
-  '@tern-secure/shared@1.3.0-canary.v20260623135837(react-dom@19.3.0(react@19.3.0))(react@19.3.0)':
+  '@tern-secure/shared@1.3.0-canary.v20261123050207(react-dom@19.3.0(react@19.3.0))(react@19.3.0)':
     dependencies:
-      '@tern-secure/types': 1.1.0-canary.v20260623135837
+      '@tern-secure/types': 1.1.0-canary.v20261123050207
       dequal: 2.0.3
       glob-to-regexp: 0.4.1
       js-cookie: 3.0.8
@@ -7279,6 +7319,8 @@ snapshots:
       react-dom: 19.3.0(react@19.3.0)
 
   '@tern-secure/types@1.1.0-canary.v20260623135837': {}
+
+  '@tern-secure/types@1.1.0-canary.v20261123050207': {}
 
   '@tootallnate/once@2.0.1':
     optional: true
@@ -8149,13 +8191,13 @@ snapshots:
 
   escape-string-regexp@4.0.0: {}
 
-  eslint-config-next@16.1.1(@typescript-eslint/parser@8.73.0(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.3))(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.3):
+  eslint-config-next@16.1.1(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.3):
     dependencies:
       '@next/eslint-plugin-next': 16.1.1
       eslint: 9.39.5(jiti@2.7.0)
       eslint-import-resolver-node: 0.3.10
-      eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.32.0)(eslint@9.39.5(jiti@2.7.0))
-      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@8.73.0(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.3))(eslint-import-resolver-typescript@3.10.1)(eslint@9.39.5(jiti@2.7.0))
+      eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.32.0(eslint@9.39.5(jiti@2.7.0)))(eslint@9.39.5(jiti@2.7.0))
+      eslint-plugin-import: 2.32.0(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(eslint@9.39.5(jiti@2.7.0)))(eslint@9.39.5(jiti@2.7.0)))(eslint@9.39.5(jiti@2.7.0))
       eslint-plugin-jsx-a11y: 6.10.2(eslint@9.39.5(jiti@2.7.0))
       eslint-plugin-react: 7.37.5(eslint@9.39.5(jiti@2.7.0))
       eslint-plugin-react-hooks: 7.1.1(eslint@9.39.5(jiti@2.7.0))
@@ -8170,13 +8212,13 @@ snapshots:
       - eslint-plugin-import-x
       - supports-color
 
-  eslint-config-next@16.4.6(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.3):
+  eslint-config-next@16.4.6(@typescript-eslint/parser@8.73.0(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.3))(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.3):
     dependencies:
       '@next/eslint-plugin-next': 16.4.6(eslint@9.39.5(jiti@2.7.0))
       eslint: 9.39.5(jiti@2.7.0)
       eslint-import-resolver-node: 0.3.10
-      eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.32.0(eslint@9.39.5(jiti@2.7.0)))(eslint@9.39.5(jiti@2.7.0))
-      eslint-plugin-import: 2.32.0(eslint-import-resolver-typescript@3.10.1)(eslint@9.39.5(jiti@2.7.0))
+      eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.32.0)(eslint@9.39.5(jiti@2.7.0))
+      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@8.73.0(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.3))(eslint-import-resolver-typescript@3.10.1)(eslint@9.39.5(jiti@2.7.0))
       eslint-plugin-jsx-a11y: 6.10.2(eslint@9.39.5(jiti@2.7.0))
       eslint-plugin-react: 7.37.5(eslint@9.39.5(jiti@2.7.0))
       eslint-plugin-react-hooks: 7.1.1(eslint@9.39.5(jiti@2.7.0))
@@ -8210,7 +8252,7 @@ snapshots:
       tinyglobby: 0.2.17
       unrs-resolver: 1.13.0
     optionalDependencies:
-      eslint-plugin-import: 2.32.0(eslint-import-resolver-typescript@3.10.1)(eslint@9.39.5(jiti@2.7.0))
+      eslint-plugin-import: 2.32.0(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(eslint@9.39.5(jiti@2.7.0)))(eslint@9.39.5(jiti@2.7.0)))(eslint@9.39.5(jiti@2.7.0))
     transitivePeerDependencies:
       - supports-color
 
@@ -8279,7 +8321,7 @@ snapshots:
       - eslint-import-resolver-webpack
       - supports-color
 
-  eslint-plugin-import@2.32.0(eslint-import-resolver-typescript@3.10.1)(eslint@9.39.5(jiti@2.7.0)):
+  eslint-plugin-import@2.32.0(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.32.0(eslint@9.39.5(jiti@2.7.0)))(eslint@9.39.5(jiti@2.7.0)))(eslint@9.39.5(jiti@2.7.0)):
     dependencies:
       '@rtsao/scc': 1.1.0
       array-includes: 3.2.0
@@ -9349,7 +9391,7 @@ snapshots:
       react: 19.2.3
       react-dom: 19.2.3(react@19.2.3)
 
-  next@16.1.1(@babel/core@7.29.13)(@opentelemetry/api@1.10.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3):
+  next@16.1.1(@opentelemetry/api@1.10.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3):
     dependencies:
       '@next/env': 16.1.1
       '@swc/helpers': 0.5.15
@@ -9358,7 +9400,7 @@ snapshots:
       postcss: 8.4.31
       react: 19.2.3
       react-dom: 19.2.3(react@19.2.3)
-      styled-jsx: 5.1.6(@babel/core@7.29.13)(react@19.2.3)
+      styled-jsx: 5.1.6(react@19.2.3)
     optionalDependencies:
       '@next/swc-darwin-arm64': 16.1.1
       '@next/swc-darwin-x64': 16.1.1
@@ -9374,7 +9416,7 @@ snapshots:
       - '@babel/core'
       - babel-plugin-macros
 
-  next@16.4.6(@opentelemetry/api@1.10.0)(@types/node@20.19.43)(react-dom@19.3.0(react@19.3.0))(react@19.3.0):
+  next@16.4.6(@babel/core@7.29.13)(@opentelemetry/api@1.10.0)(@types/node@20.19.43)(react-dom@19.3.0(react@19.3.0))(react@19.3.0):
     dependencies:
       '@next/env': 16.4.6
       '@swc/helpers': 0.5.23
@@ -9383,7 +9425,7 @@ snapshots:
       postcss: 8.5.23
       react: 19.3.0
       react-dom: 19.3.0(react@19.3.0)
-      styled-jsx: 5.1.6(react@19.3.0)
+      styled-jsx: 5.1.6(@babel/core@7.29.13)(react@19.3.0)
     optionalDependencies:
       '@next/swc-darwin-arm64': 16.4.6
       '@next/swc-darwin-x64': 16.4.6
@@ -10141,17 +10183,17 @@ snapshots:
   stubs@3.0.0:
     optional: true
 
-  styled-jsx@5.1.6(@babel/core@7.29.13)(react@19.2.3):
-    dependencies:
-      client-only: 0.0.1
-      react: 19.2.3
-    optionalDependencies:
-      '@babel/core': 7.29.13
-
-  styled-jsx@5.1.6(react@19.3.0):
+  styled-jsx@5.1.6(@babel/core@7.29.13)(react@19.3.0):
     dependencies:
       client-only: 0.0.1
       react: 19.3.0
+    optionalDependencies:
+      '@babel/core': 7.29.13
+
+  styled-jsx@5.1.6(react@19.2.3):
+    dependencies:
+      client-only: 0.0.1
+      react: 19.2.3
 
   supports-color@7.2.0:
     dependencies:

@@ -35,7 +35,7 @@ export default function RootLayout({
       
           <TernSecureProvider
             appName="TernSecureAuth"
-            ternUIUrl="https://cdn.jsdelivr.net/npm/@tern-secure/auth@1.1.0-canary.v20260103004539/dist/ternsecure.browser.js"
+            ternUIUrl="https://cdn.jsdelivr.net/npm/@tern-secure/auth@1.1.0-canary.v20261123050207/dist/ternsecure.browser.js"
             persistence="browserCookie"
             apiUrl='localhost:5001'
             requiresVerification={false}
