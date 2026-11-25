@@ -18,9 +18,7 @@ export const config = {
 
 export default ternSecureProxy(async (auth, request) => {
     if (!publicPaths(request)) {
-        await auth.protect((require) => {
-            return require({ admin: true });
-        });
+        await auth.protect();
     }
 }, {
     session: { maxAge: '90 minutes' }
